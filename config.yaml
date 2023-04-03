@@ -1,4 +1,12 @@
 
+#scenario: see solve.py
+#first argument must be #years
+#20a counts back from 2020
+#H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
+run_settings:
+  country: [DE]
+  scenario: [20a-H2u-wm]
+
 current_version: 190929
 
 cutout_folder: "../cutouts/"
@@ -53,6 +61,23 @@ octant_compression:
 balances_to_display: ["electricity","hydrogen"]
 
 preferred order: ["wind","solar","battery storage","battery inverter","hydrogen storage","hydrogen storing compressor","hydrogen electrolyser","seawater desalination","hydrogen turbine"]
+
+
+solver:
+  name: gurobi
+  options: gurobi-default
+
+solver_options:
+  gurobi-default:
+    threads: 4
+    method: 2 # barrier
+    crossover: 0
+    BarConvTol: 1.e-6
+    Seed: 123
+    AggFill: 0
+    PreDual: 0
+    GURO_PAR_BARDENSETHRESH: 200
+    seed: 10              # Consistent seed for all plattforms
 
 
 colors:
