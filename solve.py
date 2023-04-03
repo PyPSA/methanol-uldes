@@ -23,22 +23,14 @@ from pypsa.linopt import get_var, linexpr, define_constraints
 
 import pandas as pd
 from pyomo.environ import Constraint
-from rq import get_current_job
 
 import json, os, hashlib, yaml
-
-#required to stop wierd failures
-import netCDF4
-
-from atlite.gis import spdiag, compute_indicatormatrix
 
 import xarray as xr
 
 import scipy as sp
 
 import numpy as np
-
-from shapely.geometry import box, Point, Polygon, MultiPolygon
 
 
 with open("config.yaml", "r") as f:
@@ -56,9 +48,10 @@ defaults_nt = defaults.swaplevel().loc[""]
 
 default_assumptions = pd.concat((defaults_nt,defaults_t[str(config["tech_years_default"])])).sort_index()
 
-datasets = {"onwind0" : "/home/tom/Downloads/ERA5_data_1950-2020/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
-            "onwind1" : "/home/tom/Downloads/ERA5_data_1950-2020/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
-            "solar" : "/home/tom/Downloads/ERA5_data_1950-2020/ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc"}
+# from https://doi.org/10.17864/1947.000321
+datasets = {"onwind0" : "data/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
+            "onwind1" : "data/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
+            "solar" : "data/NUTS_0_sp_historical.nc"}
 
 df = {}
 

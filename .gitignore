@@ -67,3 +67,9 @@ static/d*
 !defaults-initial.csv
 
 .snakemake*
+
+data/
+
+logs/
+
+*.swp
