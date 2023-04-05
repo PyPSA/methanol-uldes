@@ -386,6 +386,18 @@ def run_optimisation(assumptions, pu):
                     efficiency2=assumptions["methanolisation_co2"]*0.98,
                     capital_cost=assumptions_df.at["hydrogen_turbine","fixed"]*2*0.6)
 
+        if assumptions["reformer"]:
+            network.add("Link",
+                        "reformer",
+                        bus0="methanol",
+                        bus1="hydrogen",
+                        bus2="co2",
+                        carrier="reformer",
+                        p_nom_extendable=True,
+                        efficiency=assumptions["reformer_efficiency"]/100.,
+                        efficiency2=assumptions["reformer_capture_rate"],
+                        capital_cost=assumptions_df.at["reformer","fixed"])
+
 
     if assumptions["co2_limit"]:
         network.add("GlobalConstraint","co2_limit",
@@ -451,6 +463,8 @@ if __name__ == "__main__":
     opts = scenario.split("-")
     if "wm" in opts:
         assumptions["methanol"] = True
+    if "wref" in opts:
+        assumptions["reformer"] = True
     if "nH2t" in opts:
         assumptions["hydrogen"] = False
     if "H2s" in opts:

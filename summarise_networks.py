@@ -15,8 +15,9 @@ for fn in snakemake.input:
                     index_col=0,
                     header=None).squeeze("columns")
 
+    name = fn[fn.rfind("/")+1:-4]
     df = add(df,
              s,
-             fn[fn.find("-")+1:-4])
+             name)
 
 df.to_csv(snakemake.output[0])

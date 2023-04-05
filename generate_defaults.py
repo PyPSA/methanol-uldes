@@ -54,6 +54,7 @@ for name,td_name,full_name in [("wind","onwind","Onshore wind turbine"),
                                ("dac","direct air capture","Direct air capture"),
                                ("heat_pump","industrial heat pump medium temperature","Industrial heat pump up to 125 C"),
                                ("liquid_carbonaceous_storage","General liquid hydrocarbon storage (product)","Liquid carbonaceous fuel storage tank"),
+                               ("reformer","SMR CC","Steam methanol reformer with carbon capture"),
                                ("methanolisation","methanolisation","Methanol synthesis")]:
     print(name,full_name)
     df.loc[(name + "_discount",""),:] = ["f",5,"percent",full_name + " discount rate",""]
@@ -77,10 +78,18 @@ for name,td_name,full_name in [("wind","onwind","Onshore wind turbine"),
                                                     full_name + " lifetime",
                                                     td[year].loc[(td_name,"lifetime"),"source"]]
 
+for year in years:
+    df.loc[("reformer_capture_rate",str(year)),:] = ["f",
+                                                     td[year].loc[("SMR CC","capture_rate"),"value"],
+                                                     td[year].loc[("SMR CC","capture_rate"),"unit"],
+                                                     "reformer capture rate",
+                                                     td[year].loc[("SMR CC","capture_rate"),"source"]]
+
 
 for name,td_name,full_name in [("battery_power_efficiency_charging","battery inverter","Battery power charging efficiency"),
                                ("battery_power_efficiency_discharging","battery inverter","Battery power discharging efficiency"),
                                ("heat_pump_efficiency","industrial heat pump medium temperature","Industrial heat pump COP"),
+                               ("reformer_efficiency","SMR CC","Steam methane reformer with carbon capture"),
                                ("hydrogen_electrolyser_efficiency","electrolysis","Hydrogen electrolyser efficiency"),
                                ("hydrogen_turbine_efficiency","CCGT","Hydrogen combined cycle turbine efficiency")]:
 

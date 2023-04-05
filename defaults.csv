@@ -55,6 +55,7 @@ solar,,b,True,,Utility-scale solar PV,
 battery,,b,True,,Utility-scale battery storage,
 hydrogen,,b,True,,Hydrogen gas storage,
 methanol,,b,False,,Methanol storage (methanolisation for PtMeOH then Allam cycle for MeOHtP),
+reformer,,b,False,,Steam methanol reformer,
 dispatchable1,,b,False,,Include dispatchable technology 1,Default assumption is based on open cycle natural gas turbine (OCGT)
 dispatchable2,,b,False,,Include dispatchable technology 2,Default assumption is based on new nuclear EPR reactor in Europe
 co2_limit,,b,False,,Limit on CO2 emissions,
@@ -223,6 +224,19 @@ liquid_carbonaceous_storage_lifetime,2040,f,30.0,years,Liquid carbonaceous fuel 
 liquid_carbonaceous_storage_cost,2050,f,187.5,EUR/m^3,Liquid carbonaceous fuel storage tank capital cost (overnight),"Stelter and Nishida 2013: https://webstore.iea.org/insights-series-2013-focus-on-energy-security , pg. 8F ."
 liquid_carbonaceous_storage_fom,2050,f,6.25,percent of overnight cost per year,Liquid carbonaceous fuel storage tank fixed operation and maintenance costs,"Stelter and Nishida 2013: https://webstore.iea.org/insights-series-2013-focus-on-energy-security , figure 7 and pg. 12 ."
 liquid_carbonaceous_storage_lifetime,2050,f,30.0,years,Liquid carbonaceous fuel storage tank lifetime,"Stelter and Nishida 2013: https://webstore.iea.org/insights-series-2013-focus-on-energy-security , pg. 11."
+reformer_discount,,f,5,percent,Steam methanol reformer with carbon capture discount rate,
+reformer_cost,2020,f,632004.2,EUR/MW_CH4,Steam methanol reformer with carbon capture capital cost (overnight),Danish Energy Agency
+reformer_fom,2020,f,5.0,percent of overnight cost per year,Steam methanol reformer with carbon capture fixed operation and maintenance costs,Danish Energy Agency
+reformer_lifetime,2020,f,30.0,years,Steam methanol reformer with carbon capture lifetime,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
+reformer_cost,2030,f,632004.2,EUR/MW_CH4,Steam methanol reformer with carbon capture capital cost (overnight),Danish Energy Agency
+reformer_fom,2030,f,5.0,percent of overnight cost per year,Steam methanol reformer with carbon capture fixed operation and maintenance costs,Danish Energy Agency
+reformer_lifetime,2030,f,30.0,years,Steam methanol reformer with carbon capture lifetime,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
+reformer_cost,2040,f,632004.2,EUR/MW_CH4,Steam methanol reformer with carbon capture capital cost (overnight),Danish Energy Agency
+reformer_fom,2040,f,5.0,percent of overnight cost per year,Steam methanol reformer with carbon capture fixed operation and maintenance costs,Danish Energy Agency
+reformer_lifetime,2040,f,30.0,years,Steam methanol reformer with carbon capture lifetime,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
+reformer_cost,2050,f,632004.2,EUR/MW_CH4,Steam methanol reformer with carbon capture capital cost (overnight),Danish Energy Agency
+reformer_fom,2050,f,5.0,percent of overnight cost per year,Steam methanol reformer with carbon capture fixed operation and maintenance costs,Danish Energy Agency
+reformer_lifetime,2050,f,30.0,years,Steam methanol reformer with carbon capture lifetime,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
 methanolisation_discount,,f,5,percent,Methanol synthesis discount rate,
 methanolisation_cost,2020,f,836231.9,EUR/MW_MeOH,Methanol synthesis capital cost (overnight),"Agora Energiewende (2018): The Future Cost of Electricity-Based Synthetic Fuels (https://www.agora-energiewende.de/en/publications/the-future-cost-of-electricity-based-synthetic-fuels-1/), table 8: “Reference scenario”."
 methanolisation_fom,2020,f,3.0,percent of overnight cost per year,Methanol synthesis fixed operation and maintenance costs,"Agora Energiewende (2018): The Future Cost of Electricity-Based Synthetic Fuels (https://www.agora-energiewende.de/en/publications/the-future-cost-of-electricity-based-synthetic-fuels-1/), section 6.3.2.1."
@@ -236,6 +250,10 @@ methanolisation_lifetime,2040,f,20.0,years,Methanol synthesis lifetime,"Danish E
 methanolisation_cost,2050,f,530604.0,EUR/MW_MeOH,Methanol synthesis capital cost (overnight),"Agora Energiewende (2018): The Future Cost of Electricity-Based Synthetic Fuels (https://www.agora-energiewende.de/en/publications/the-future-cost-of-electricity-based-synthetic-fuels-1/), table 8: “Reference scenario”."
 methanolisation_fom,2050,f,3.0,percent of overnight cost per year,Methanol synthesis fixed operation and maintenance costs,"Agora Energiewende (2018): The Future Cost of Electricity-Based Synthetic Fuels (https://www.agora-energiewende.de/en/publications/the-future-cost-of-electricity-based-synthetic-fuels-1/), section 6.3.2.1."
 methanolisation_lifetime,2050,f,20.0,years,Methanol synthesis lifetime,"Danish Energy Agency, Technology Data for Renewable Fuels (04/2022), Data sheet “Methanol to Power”."
+reformer_capture_rate,2020,f,0.9,EUR/MW_CH4,reformer capture rate,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
+reformer_capture_rate,2030,f,0.9,EUR/MW_CH4,reformer capture rate,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
+reformer_capture_rate,2040,f,0.9,EUR/MW_CH4,reformer capture rate,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
+reformer_capture_rate,2050,f,0.9,EUR/MW_CH4,reformer capture rate,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
 battery_power_efficiency_charging,2020,f,97.46794344808963,percent,Battery power charging efficiency,"Danish Energy Agency, technology_data_catalogue_for_energy_storage.xlsx"
 battery_power_efficiency_charging,2030,f,97.97958971132712,percent,Battery power charging efficiency,"Danish Energy Agency, technology_data_catalogue_for_energy_storage.xlsx"
 battery_power_efficiency_charging,2040,f,97.97958971132712,percent,Battery power charging efficiency,"Danish Energy Agency, technology_data_catalogue_for_energy_storage.xlsx"
@@ -248,6 +266,10 @@ heat_pump_efficiency,2020,f,254.99999999999997,percent,Industrial heat pump COP,
 heat_pump_efficiency,2030,f,270.0,percent,Industrial heat pump COP,"Danish Energy Agency, technology_data_for_industrial_process_heat.xlsx"
 heat_pump_efficiency,2040,f,280.0,percent,Industrial heat pump COP,"Danish Energy Agency, technology_data_for_industrial_process_heat.xlsx"
 heat_pump_efficiency,2050,f,285.0,percent,Industrial heat pump COP,"Danish Energy Agency, technology_data_for_industrial_process_heat.xlsx"
+reformer_efficiency,2020,f,69.0,percent,Steam methane reformer with carbon capture,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
+reformer_efficiency,2030,f,69.0,percent,Steam methane reformer with carbon capture,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
+reformer_efficiency,2040,f,69.0,percent,Steam methane reformer with carbon capture,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
+reformer_efficiency,2050,f,69.0,percent,Steam methane reformer with carbon capture,"IEA Global average levelised cost of hydrogen production by energy source and technology, 2019 and 2050 (2020), https://www.iea.org/data-and-statistics/charts/global-average-levelised-cost-of-hydrogen-production-by-energy-source-and-technology-2019-and-2050"
 hydrogen_electrolyser_efficiency,2020,f,66.0,"""percent, LHV""",Hydrogen electrolyser efficiency,"Danish Energy Agency, data_sheets_for_renewable_fuels.xlsx"
 hydrogen_electrolyser_efficiency,2030,f,68.0,"""percent, LHV""",Hydrogen electrolyser efficiency,"Danish Energy Agency, data_sheets_for_renewable_fuels.xlsx"
 hydrogen_electrolyser_efficiency,2040,f,72.0,"""percent, LHV""",Hydrogen electrolyser efficiency,"Danish Energy Agency, data_sheets_for_renewable_fuels.xlsx"
