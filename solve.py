@@ -485,6 +485,11 @@ if __name__ == "__main__":
         print("no H2 storage defined")
         sys.exit()
 
+    for opt in opts:
+        if opt[:5] == "mflex":
+            assumptions["methanolisation_min_part_load"] = int(opt[5:])
+            print("Methanol min part load set to",assumptions["methanolisation_min_part_load"])
+
     years = int(opts[0][:-1])
     print(years,"years to optimise")
     assumptions["year_start"] = 2020 - years + 1
