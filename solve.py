@@ -486,4 +486,6 @@ if __name__ == "__main__":
 
     n, message = run_optimisation(assumptions,pu)
 
+    n.status = message
+
     n.export_to_netcdf(snakemake.output[0])
