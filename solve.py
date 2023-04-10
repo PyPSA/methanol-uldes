@@ -341,6 +341,14 @@ def run_optimisation(assumptions, pu):
                     efficiency=1/assumptions["dac_electricity"],
                     efficiency2=-assumptions["dac_heat"]/assumptions["dac_electricity"])
 
+        network.add("Generator",
+                    "co2 vent",
+                    bus="co2",
+                    p_max_pu=0,
+                    p_min_pu=-1,
+                    p_nom=1e6,
+                    carrier="co2 vent")
+
         network.add("Store",
                     "co2",
                     bus="co2",
