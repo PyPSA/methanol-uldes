@@ -9,13 +9,20 @@ def add(df,s,name):
     df[name] = s
     return df
 
+
+if "balances" in snakemake.output[0]:
+    index_col = (0,1)
+else:
+    index_col = 0
+
 for fn in snakemake.input:
     print(fn)
     s = pd.read_csv(fn,
-                    index_col=0,
+                    index_col=index_col,
                     header=None).squeeze("columns")
 
-    name = fn[fn.rfind("/")+1:-4]
+    fn = fn[fn.rfind("/")+1:-4]
+    name = fn[fn.find("-")+1:]
     df = add(df,
              s,
              name)
