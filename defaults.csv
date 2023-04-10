@@ -56,6 +56,8 @@ battery,,b,True,,Utility-scale battery storage,
 hydrogen,,b,True,,Hydrogen gas storage,
 methanol,,b,False,,Methanol storage (methanolisation for PtMeOH then Allam cycle for MeOHtP),
 reformer,,b,False,,Steam methanol reformer,
+biogenic_co2,,b,False,,CO2 from biomass,
+biogenic_co2_price,,f,50,EUR/tCO2,Price of CO2 from biomass,
 dispatchable1,,b,False,,Include dispatchable technology 1,Default assumption is based on open cycle natural gas turbine (OCGT)
 dispatchable2,,b,False,,Include dispatchable technology 2,Default assumption is based on new nuclear EPR reactor in Europe
 co2_limit,,b,False,,Limit on CO2 emissions,

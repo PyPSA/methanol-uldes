@@ -349,6 +349,15 @@ def run_optimisation(assumptions, pu):
                     p_nom=1e6,
                     carrier="co2 vent")
 
+        if assumptions["biogenic_co2"]:
+            network.add("Generator",
+                        "biogenic co2",
+                        bus="co2",
+                        p_nom=1e6,
+                        marginal_cost=assumptions["biogenic_co2_price"],
+                        carrier="biogenic co2")
+
+
         network.add("Store",
                     "co2",
                     bus="co2",
@@ -475,6 +484,8 @@ if __name__ == "__main__":
         assumptions["reformer"] = True
     if "nH2t" in opts:
         assumptions["hydrogen"] = False
+    if "bioco2" in opts:
+        assumptions["biogenic_co2"] = True
     if "H2s" in opts:
         assumptions["hydrogen_energy_cost"] = 13
         assumptions["hydrogen_energy_fom"] = 2
