@@ -1,12 +1,19 @@
 
 
-import pandas as pd, pypsa, numpy as np
+import pandas as pd, pypsa, numpy as np, sys
 
 n = pypsa.Network(snakemake.input[0])
 
 s = pd.Series()
 
-s.loc["total_load"] = n.loads_t.p.multiply(n.snapshot_weightings["generators"],axis=0)["load"].sum()
+
+if "load" in n.loads.index:
+    s.loc["total_load"] = n.loads_t.p.multiply(n.snapshot_weightings["generators"],axis=0)["load"].sum()
+elif "load" in n.generators.index:
+    s.loc["total_load"] = -n.generators_t.p.multiply(n.snapshot_weightings["generators"],axis=0)["load"].sum()
+else:
+    print("cannot find load")
+    sys.exit()
 s.loc["objective"] = n.objective
 
 s.loc["lcoe"] = s.loc["objective"]/s.loc["total_load"]

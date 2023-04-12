@@ -4,11 +4,11 @@
 #20a counts back from 2020
 #H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
 
-run: "230410-20a-UK-DE-bioco2"
+run: "230412-71a-UK-elastic"
 
 run_settings:
-  country: [UK,DE]
-  scenario: [20a-H2s-wm-nH2t-mflex0-bioco2,20a-H2s-wm-nH2t-mflex20-bioco2,20a-H2s-wm-nH2t-mflex50-bioco2]
+  country: [UK]
+  scenario: [71a-H2u,71a-H2u-elastic2000,71a-H2s-wm-nH2t,71a-H2s-wm-nH2t-elastic2000]
 
 current_version: 190929
 

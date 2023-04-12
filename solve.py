@@ -173,10 +173,28 @@ def run_optimisation(assumptions, pu):
 
     network.add("Bus","electricity",
                 carrier="electricity")
-    network.add("Load","load",
-                bus="electricity",
-                carrier="load",
-                p_set=assumptions["load"])
+
+    if assumptions["voll"]:
+        network.add("Generator","load",
+                    bus="electricity",
+                    carrier="load",
+                    marginal_cost=assumptions["voll_price"],
+                    p_max_pu=0,
+                    p_min_pu=-1,
+                    p_nom=assumptions["load"])
+    elif assumptions["elastic"]:
+        network.add("Generator","load",
+                    bus="electricity",
+                    carrier="load",
+                    marginal_cost=assumptions["elastic_intercept"],
+                    p_max_pu=0,
+                    p_min_pu=-1,
+                    p_nom=assumptions["load"])
+    else:
+        network.add("Load","load",
+                    bus="electricity",
+                    carrier="load",
+                    p_set=assumptions["load"])
 
     if assumptions["solar"]:
         network.add("Generator","solar",
@@ -199,6 +217,8 @@ def run_optimisation(assumptions, pu):
                     p_nom_max = assumptions["wind_max"],
                     marginal_cost = 0.2, #Small cost to prefer curtailment to destroying energy in storage, solar curtails before wind
                     capital_cost = assumptions_df.at['wind','fixed'])
+
+
 
     for i in range(1,3):
         name = "dispatchable" + str(i)
@@ -255,10 +275,11 @@ def run_optimisation(assumptions, pu):
                 "hydrogen",
                 carrier="hydrogen")
 
-    network.add("Load","hydrogen_load",
-                bus="hydrogen",
-                carrier="hydrogen",
-                p_set=assumptions["hydrogen_load"])
+    if assumptions["hydrogen_load"] != 0:
+        network.add("Load","hydrogen_load",
+                    bus="hydrogen",
+                    carrier="hydrogen",
+                    p_set=assumptions["hydrogen_load"])
 
     network.add("Link",
                 "hydrogen_electrolyser",
@@ -421,6 +442,15 @@ def run_optimisation(assumptions, pu):
                     sense="<=",
                     constant=assumptions["co2_emissions"]*assumptions["load"]*network.snapshot_weightings.objective.sum())
 
+    if assumptions["elastic"]:
+        network.generators["quadratic_coefficient"] = 0.
+        #create inverse demand curve where elastic_intercept is price p where demand d
+        #vanishes and load is demand d for zero p
+        #inverse demand curve: p(d) = intercept - intercept/load*d
+        #utility: U(d) = intercept*d - intercept/(2*load)*d^2
+        #since demand is negative generator, take care with signs!
+        network.generators.at["load","quadratic_coefficient"] = assumptions["elastic_intercept"]/(2*assumptions["load"])
+
     network.consistency_check()
 
     solver_name = config["solver"]["name"]
@@ -498,8 +528,14 @@ if __name__ == "__main__":
 
     for opt in opts:
         if opt[:5] == "mflex":
-            assumptions["methanolisation_min_part_load"] = int(opt[5:])
+            assumptions["methanolisation_min_part_load"] = float(opt[5:])
             print("Methanol min part load set to",assumptions["methanolisation_min_part_load"])
+        if opt[:4] == "voll":
+            assumptions["voll"] = True
+            assumptions["voll_price"] = float(opt[4:])
+        if opt[:7] == "elastic":
+            assumptions["elastic"] = True
+            assumptions["elastic_intercept"] = float(opt[7:])
 
     years = int(opts[0][:-1])
     print(years,"years to optimise")

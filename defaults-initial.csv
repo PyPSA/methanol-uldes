@@ -58,6 +58,10 @@ methanol,,b,False,,Methanol storage (methanolisation for PtMeOH then Allam cycle
 reformer,,b,False,,Steam methanol reformer,
 biogenic_co2,,b,False,,CO2 from biomass,
 biogenic_co2_price,,f,50,EUR/tCO2,Price of CO2 from biomass,
+voll,,b,False,,Activate Value of Lost Load,
+voll_price,,f,2000,EUR/tMWh,Value of Lost Load,
+elastic,,b,False,,Elastic demand,
+elastic_intercept,,f,2000,EUR/tMWh,Price at which load vanishes,
 dispatchable1,,b,False,,Include dispatchable technology 1,Default assumption is based on open cycle natural gas turbine (OCGT)
 dispatchable2,,b,False,,Include dispatchable technology 2,Default assumption is based on new nuclear EPR reactor in Europe
 co2_limit,,b,False,,Limit on CO2 emissions,
