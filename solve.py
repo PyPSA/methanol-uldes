@@ -19,8 +19,6 @@ import pypsa
 
 import sys
 
-from pypsa.linopt import get_var, linexpr, define_constraints
-
 from vresutils.benchmark import memory_logger
 
 import pandas as pd
@@ -265,17 +263,6 @@ def run_optimisation(assumptions, pu):
                     p_nom_extendable = True,
                     efficiency = assumptions["battery_power_efficiency_discharging"]/100.)
 
-        def extra_functionality(network,snapshots):
-
-            link_p_nom = get_var(network, "Link", "p_nom")
-
-            lhs = linexpr((1,link_p_nom["battery_power"]),
-                          (-network.links.loc["battery_discharge", "efficiency"],
-                           link_p_nom["battery_discharge"]))
-            define_constraints(network, lhs, "=", 0, 'Link', 'charger_ratio')
-    else:
-        def extra_functionality(network,snapshots):
-            pass
 
     network.add("Bus",
                 "hydrogen",
@@ -463,13 +450,18 @@ def run_optimisation(assumptions, pu):
     solver_options = config["solver_options"][config["solver"]["options"]]
     solver_logfile = snakemake.log.solver
 
-    formulation = "kirchhoff"
-    status, termination_condition = network.lopf(pyomo=False,
-                                                 solver_name=solver_name,
-                                                 solver_options=solver_options,
-                                                 solver_logfile=solver_logfile,
-                                                 formulation=formulation,
-                                                 extra_functionality=extra_functionality)
+    network.optimize.create_model()
+
+    if assumptions["battery"]:
+        network.model.add_constraints(network.model["Link-p_nom"].loc["battery_power"]
+                                      -network.links.loc["battery_discharge", "efficiency"]*
+                                      network.model["Link-p_nom"].loc["battery_discharge"] == 0,
+                                      name='charger_ratio')
+
+
+    status, termination_condition = network.optimize.solve_model(solver_name=solver_name,
+                                                                 solver_options=solver_options,
+                                                                 log_fn=solver_logfile)
 
     print(status,termination_condition)
 
