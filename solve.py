@@ -21,6 +21,8 @@ import sys
 
 from pypsa.linopt import get_var, linexpr, define_constraints
 
+from vresutils.benchmark import memory_logger
+
 import pandas as pd
 from pyomo.environ import Constraint
 
@@ -31,6 +33,10 @@ import xarray as xr
 import scipy as sp
 
 import numpy as np
+
+import logging
+logger = logging.getLogger(__name__)
+pypsa.pf.logger.setLevel(logging.WARNING)
 
 
 with open("config.yaml", "r") as f:
@@ -455,11 +461,13 @@ def run_optimisation(assumptions, pu):
 
     solver_name = config["solver"]["name"]
     solver_options = config["solver_options"][config["solver"]["options"]]
+    solver_logfile = snakemake.log.solver
 
     formulation = "kirchhoff"
     status, termination_condition = network.lopf(pyomo=False,
                                                  solver_name=solver_name,
                                                  solver_options=solver_options,
+                                                 solver_logfile=solver_logfile,
                                                  formulation=formulation,
                                                  extra_functionality=extra_functionality)
 
@@ -498,7 +506,11 @@ if __name__ == "__main__":
     country = snakemake.wildcards.country
     scenario = snakemake.wildcards.scenario
 
-    print("computing country",country,"and scenario",scenario)
+    logging.basicConfig(filename=snakemake.log.python,
+                        level=snakemake.config['logging_level'])
+
+
+    logger.info(f"computing country {country} and scenario {scenario}")
 
     pu = pd.DataFrame()
     pu["onwind"] = df["onwind0"][country]
@@ -544,8 +556,13 @@ if __name__ == "__main__":
 
     print("optimising from",assumptions["year_start"],"to",assumptions["year_end"])
 
-    n, message = run_optimisation(assumptions,pu)
 
-    n.status = message
+    with memory_logger(filename=snakemake.log.memory, interval=30.) as mem:
 
-    n.export_to_netcdf(snakemake.output[0])
+        n, message = run_optimisation(assumptions,pu)
+
+        n.status = message
+
+        n.export_to_netcdf(snakemake.output[0])
+
+    logger.info("Maximum memory usage: {}".format(mem.mem_usage))

@@ -60,4 +60,8 @@ rule solve:
     threads: 4
     resources:
         mem_mb=20000
+    log:
+        solver="logs/" + config['run'] + "/{country}-{scenario}-solver.log",
+        python="logs/" + config['run'] + "/{country}-{scenario}-python.log",
+	memory="logs/" + config['run'] + "/{country}-{scenario}-memory.log",
     script: "solve.py"
