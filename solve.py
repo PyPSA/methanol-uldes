@@ -414,9 +414,9 @@ def run_optimisation(assumptions, pu):
                     bus2="co2",
                     carrier="Allam cycle",
                     p_nom_extendable=True,
-                    efficiency=0.6,
+                    efficiency=0.65,
                     efficiency2=assumptions["methanolisation_co2"]*0.98,
-                    capital_cost=assumptions_df.at["hydrogen_turbine","fixed"]*2*0.6)
+                    capital_cost=1.5*assumptions_df.at["hydrogen_turbine","fixed"]*0.65)
 
     if assumptions["methanol_load"] != 0:
         network.add("Load","methanol_load",
