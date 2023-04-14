@@ -325,7 +325,7 @@ def run_optimisation(assumptions, pu):
                      efficiency=assumptions["hydrogen_turbine_efficiency"]/100.,
                      capital_cost=assumptions_df.at["hydrogen_turbine","fixed"]*assumptions["hydrogen_turbine_efficiency"]/100.)  #NB: fixed cost is per MWel
 
-    if assumptions["methanol"]:
+    if assumptions["methanol"] or assumptions["methanol_load"] != 0:
 
         network.add("Bus",
                     "co2",
@@ -406,6 +406,7 @@ def run_optimisation(assumptions, pu):
                     efficiency3=-assumptions["methanolisation_co2"]*assumptions["methanolisation_efficiency"],
                     capital_cost=assumptions_df.at["methanolisation","fixed"]*assumptions["methanolisation_efficiency"]) #NB: cost is EUR/kW_MeOH
 
+    if assumptions["methanol"]:
         network.add("Link",
                     "Allam",
                     bus0="methanol",
@@ -417,17 +418,23 @@ def run_optimisation(assumptions, pu):
                     efficiency2=assumptions["methanolisation_co2"]*0.98,
                     capital_cost=assumptions_df.at["hydrogen_turbine","fixed"]*2*0.6)
 
-        if assumptions["reformer"]:
-            network.add("Link",
-                        "reformer",
-                        bus0="methanol",
-                        bus1="hydrogen",
-                        bus2="co2",
-                        carrier="reformer",
-                        p_nom_extendable=True,
-                        efficiency=assumptions["reformer_efficiency"]/100.,
-                        efficiency2=assumptions["reformer_capture_rate"],
-                        capital_cost=assumptions_df.at["reformer","fixed"])
+    if assumptions["methanol_load"] != 0:
+        network.add("Load","methanol_load",
+                    bus="methanol",
+                    carrier="methanol",
+                    p_set=assumptions["methanol_load"])
+
+    if assumptions["reformer"]:
+        network.add("Link",
+                    "reformer",
+                    bus0="methanol",
+                    bus1="hydrogen",
+                    bus2="co2",
+                    carrier="reformer",
+                    p_nom_extendable=True,
+                    efficiency=assumptions["reformer_efficiency"]/100.,
+                    efficiency2=assumptions["reformer_capture_rate"],
+                    capital_cost=assumptions_df.at["reformer","fixed"])
 
 
     if assumptions["co2_limit"]:
@@ -531,6 +538,12 @@ if __name__ == "__main__":
         sys.exit()
 
     for opt in opts:
+        if opt[:2] == "ed":
+            assumptions["load"] = float(opt[2:])
+        if opt[:2] == "hd":
+            assumptions["hydrogen_load"] = float(opt[2:])
+        if opt[:2] == "md":
+            assumptions["methanol_load"] = float(opt[2:])
         if opt[:5] == "mflex":
             assumptions["methanolisation_min_part_load"] = float(opt[5:])
             print("Methanol min part load set to",assumptions["methanolisation_min_part_load"])

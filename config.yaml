@@ -4,13 +4,13 @@
 #20a counts back from 2020
 #H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
 
-run: "230413-2a-UK-linopy"
+run: "230414-2a-demand"
 
 logging_level: INFO
 
 run_settings:
-  country: [UK]
-  scenario: [2a-H2u,2a-H2s-wm-nH2t]
+  country: [UK,DE]
+  scenario: [2a-H2u,2a-H2u-ed75-md20-hd5,2a-H2s-wm-nH2t,2a-H2s-wm-nH2t-ed75-md20-hd5]
 
 current_version: 190929
 

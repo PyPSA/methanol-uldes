@@ -8,6 +8,7 @@ job_type,,s,None,,,
 frequency,,i,3,,Sampling frequency for weather time-series,"n-hourly, n<3 is very slow, big n solves faster (n=25 or n=49 give fast and relatively accurate results)"
 load,,f,100,MW,Constant electricity demand,Demand should be large enough for utility-scale assets but small enough to neglect land availability constraints
 hydrogen_load,,f,0,MW-H2-LHV,Constant hydrogen demand,
+methanol_load,,f,0,MW-MeOH-LHV,Constant methanol demand,
 wind_max,,f,1e7,MWp,Wind maximum capacity allowed,
 wind_min,,f,0,MWp,Wind minimum capacity allowed,
 dispatchable1_cost,2020,f,400,EUR/kW,Dispatchable technology 1 capital cost (overnight),
