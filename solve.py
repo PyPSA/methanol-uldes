@@ -401,6 +401,8 @@ def run_optimisation(assumptions, pu):
                     carrier="methanol synthesis",
                     p_nom_extendable=True,
                     p_min_pu=assumptions["methanolisation_min_part_load"]/100,
+                    ramp_limit_up=assumptions["ramp"],
+                    ramp_limit_down=assumptions["ramp"],
                     efficiency=assumptions["methanolisation_efficiency"],
                     efficiency2=-assumptions["methanolisation_electricity"]*assumptions["methanolisation_efficiency"],
                     efficiency3=-assumptions["methanolisation_co2"]*assumptions["methanolisation_efficiency"],
@@ -517,6 +519,7 @@ if __name__ == "__main__":
 
 
     assumptions = default_assumptions["value"].to_dict()
+    assumptions["ramp"] = np.nan
 
     opts = scenario.split("-")
     if "wm" in opts:
@@ -538,6 +541,8 @@ if __name__ == "__main__":
         sys.exit()
 
     for opt in opts:
+        if opt[-1:] == "H":
+            assumptions["frequency"] = int(opt[:-1])
         if opt[:2] == "ed":
             assumptions["load"] = float(opt[2:])
         if opt[:2] == "hd":
@@ -553,6 +558,8 @@ if __name__ == "__main__":
         if opt[:7] == "elastic":
             assumptions["elastic"] = True
             assumptions["elastic_intercept"] = float(opt[7:])
+        if opt[:4] == "ramp":
+            assumptions["ramp"] = float(opt[4:])/100
 
     years = int(opts[0][:-1])
     print(years,"years to optimise")
