@@ -418,7 +418,7 @@ def run_optimisation(assumptions, pu):
                     p_nom_extendable=True,
                     efficiency=0.65,
                     efficiency2=assumptions["methanolisation_co2"]*0.98,
-                    capital_cost=1.5*assumptions_df.at["hydrogen_turbine","fixed"]*0.65)
+                    capital_cost=2*assumptions_df.at["hydrogen_turbine","fixed"]*0.65)
 
     if assumptions["methanol_load"] != 0:
         network.add("Load","methanol_load",
@@ -480,6 +480,8 @@ def run_optimisation(assumptions, pu):
         return None, "Numerical trouble encountered, problem could be infeasible"
     elif status == "ok" and termination_condition == "optimal":
         return network, "OK"
+    elif status == "ok" and termination_condition == "suboptimal":
+        return network, "suboptimal"
     elif status == "warning" and termination_condition == "suboptimal":
         return network, "suboptimal"
     else:

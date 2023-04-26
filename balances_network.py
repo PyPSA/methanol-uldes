@@ -26,7 +26,7 @@ def calculate_balances(n):
 
             for end in [col[3:] for col in c.df.columns if col[:3] == "bus"]:
 
-                items = c.df.index[c.df["bus" + str(end)].map(bus_map, na_action=False)]
+                items = c.df.index[c.df["bus" + str(end)].map(bus_map, na_action=None)]
 
                 if len(items) == 0:
                     continue

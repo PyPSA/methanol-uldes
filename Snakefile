@@ -59,7 +59,8 @@ rule solve:
     output: "networks/" + config['run'] + "/{country}-{scenario}.nc"
     threads: 4
     resources:
-        mem_mb=20000
+        mem_mb=50000,
+	walltime="08:00:00"
     log:
         solver="logs/" + config['run'] + "/{country}-{scenario}-solver.log",
         python="logs/" + config['run'] + "/{country}-{scenario}-python.log",
