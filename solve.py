@@ -268,6 +268,36 @@ def run_optimisation(assumptions, pu):
                 "hydrogen",
                 carrier="hydrogen")
 
+    network.add("Bus",
+                "oxygen",
+                carrier="oxygen")
+
+    network.add("Generator",
+                "oxygen vent",
+                bus="oxygen",
+                p_max_pu=0,
+                p_min_pu=-1,
+                p_nom=1e6,
+                carrier="oxygen vent")
+
+    network.add("Link",
+                "air separation unit",
+                bus0="electricity",
+                bus1="oxygen",
+                carrier="air separation unit",
+                p_nom_extendable=True,
+                capital_cost=Nyears*3e5*0.243, # TODO based on 3e6 USD / (tO2/h) invest from https://discord.com/channels/914472852571426846/997467578513494026
+                efficiency=0.243)
+
+    network.add("Store",
+                "oxygen storage",
+                bus="oxygen",
+                carrier="oxygen storage",
+                e_nom_extendable=True,
+                e_cyclic=True,
+                capital_cost=2*assumptions_df.at["co2_storage","fixed"])
+
+
     if assumptions["hydrogen_load"] != 0:
         network.add("Load","hydrogen_load",
                     bus="hydrogen",
@@ -278,9 +308,11 @@ def run_optimisation(assumptions, pu):
                 "hydrogen_electrolyser",
                 bus0="electricity",
                 bus1="hydrogen",
+                bus2="oxygen",
                 carrier="hydrogen electrolyser",
                 p_nom_extendable=True,
                 efficiency=assumptions["hydrogen_electrolyser_efficiency"]/100.,
+                efficiency2=8*assumptions["hydrogen_electrolyser_efficiency"]/100./33,  # divide by 33 to get tH2, multiply by 8 to get tO2
                 capital_cost=assumptions_df.at["hydrogen_electrolyser","fixed"])
 
     network.add("Bus",
@@ -414,11 +446,33 @@ def run_optimisation(assumptions, pu):
                     bus0="methanol",
                     bus1="electricity",
                     bus2="co2",
+                    bus3="oxygen",
                     carrier="Allam cycle",
                     p_nom_extendable=True,
                     efficiency=0.65,
                     efficiency2=assumptions["methanolisation_co2"]*0.98,
-                    capital_cost=2*assumptions_df.at["hydrogen_turbine","fixed"]*0.65)
+                    efficiency3=-0.27,
+                    capital_cost=1.5*assumptions_df.at["hydrogen_turbine","fixed"]*0.65)
+
+    if assumptions["ccgt"]:
+        network.add("Link",
+                    "CCGT",
+                    bus0="methanol",
+                    bus1="electricity",
+                    carrier="CCGT",
+                    p_nom_extendable=True,
+                    efficiency=0.6,
+                    capital_cost=assumptions_df.at["hydrogen_turbine","fixed"]*0.6)
+
+    if assumptions["ocgt"]:
+        network.add("Link",
+                    "OCGT",
+                    bus0="methanol",
+                    bus1="electricity",
+                    carrier="OCGT",
+                    p_nom_extendable=True,
+                    efficiency=0.35,
+                    capital_cost=0.5*assumptions_df.at["hydrogen_turbine","fixed"]*0.35)
 
     if assumptions["methanol_load"] != 0:
         network.add("Load","methanol_load",
@@ -532,6 +586,10 @@ if __name__ == "__main__":
         assumptions["hydrogen"] = False
     if "bioco2" in opts:
         assumptions["biogenic_co2"] = True
+    if "ccgt" in opts:
+        assumptions["ccgt"] = True
+    if "ocgt" in opts:
+        assumptions["ocgt"] = True
     if "H2s" in opts:
         assumptions["hydrogen_energy_cost"] = 13
         assumptions["hydrogen_energy_fom"] = 2

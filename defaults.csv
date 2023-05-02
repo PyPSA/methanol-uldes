@@ -68,6 +68,8 @@ dispatchable2,,b,False,,Include dispatchable technology 2,Default assumption is 
 co2_limit,,b,False,,Limit on CO2 emissions,
 co2_emissions,,f,0.0,gCO2eq/kWhel,Maximum average system emissions,
 methanolisation_min_part_load,,f,50.0,percent,Methanol synthesis minimum part load,Private discussions.
+ccgt,,b,False,,include CCGT,
+ocgt,,b,False,,include OCGT,
 wind_cost,2020,f,1235.2,EUR/kW,Onshore wind turbine capital cost (overnight),"Danish Energy Agency, technology_data_for_el_and_dh.xlsx"
 wind_fom,2020,f,1.25,percent of overnight cost per year,Onshore wind turbine fixed operation and maintenance costs,"Danish Energy Agency, technology_data_for_el_and_dh.xlsx"
 wind_lifetime,2020,f,27.0,years,Onshore wind turbine lifetime,"Danish Energy Agency, technology_data_for_el_and_dh.xlsx"

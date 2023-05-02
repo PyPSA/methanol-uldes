@@ -68,3 +68,5 @@ dispatchable2,,b,False,,Include dispatchable technology 2,Default assumption is 
 co2_limit,,b,False,,Limit on CO2 emissions,
 co2_emissions,,f,0.0,gCO2eq/kWhel,Maximum average system emissions,
 methanolisation_min_part_load,,f,50.0,percent,Methanol synthesis minimum part load,"Private discussions."
+ccgt,,b,False,,include CCGT,
+ocgt,,b,False,,include OCGT,
