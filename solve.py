@@ -286,8 +286,8 @@ def run_optimisation(assumptions, pu):
                 bus1="oxygen",
                 carrier="air separation unit",
                 p_nom_extendable=True,
-                capital_cost=Nyears*3e5*0.243, # TODO based on 3e6 USD / (tO2/h) invest from https://discord.com/channels/914472852571426846/997467578513494026
-                efficiency=0.243)
+                capital_cost=Nyears*3e5/0.32, # based on 3e6 USD / (tO2/h) invest from https://media.path.org/documents/O2_generation_and_storage_air_separation_unit_v1.pdf, see https://discord.com/channels/914472852571426846/997467578513494026
+                efficiency=1/0.32)  # 0.32 MWh-el/tO2 from 16 MW-el for for 1200 tO2/d from https://media.path.org/documents/O2_generation_and_storage_air_separation_unit_v1.pdf
 
     network.add("Store",
                 "oxygen storage",
