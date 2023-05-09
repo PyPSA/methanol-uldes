@@ -4,13 +4,13 @@
 #20a counts back from 2020
 #H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
 
-run: "230427-71a-2040-fixed"
+run: "230503-71a-2030"
 
 logging_level: INFO
 
 run_settings:
   country: [UK,DE,ES]
-  scenario: [71a-1H-H2s,71a-1H-H2u,71a-1H-H2s-wm-nH2t-mflex50-ramp5,71a-1H-H2s-wm-nH2t-mflex0-ramp10]
+  scenario: [71a-1H-H2s,71a-1H-H2u,71a-1H-H2s-wm-nH2t-mflex50-ramp5,71a-1H-H2s-wm-nH2t-mflex0-ramp10,71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt]
 
 current_version: 190929
 
@@ -22,7 +22,7 @@ weather_years: [2011,2012,2013,2014]
 
 tech_years: [2020,2030,2040,2050]
 
-tech_years_default: 2040
+tech_years_default: 2030
 
 cost_year_assumptions: 2015
 cost_year: 2020

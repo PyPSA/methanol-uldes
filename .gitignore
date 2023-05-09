@@ -75,3 +75,5 @@ logs/
 *.swp
 
 summaries
+
+*.txt

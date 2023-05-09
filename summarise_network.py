@@ -73,6 +73,29 @@ s = pd.concat((s,
                (ts.sum()/ts["load"].sum()).rename(lambda x: x+ " share")))
 
 
+if "air separation unit" in n.links.index:
+    s.loc["air separation unit oxygen capacity"] = n.links.at["air separation unit","p_nom_opt"]*n.links.at["air separation unit","efficiency"]
+
+if "dac" in n.links.index:
+    s.loc["dac oxygen capacity"] = n.links.at["dac","p_nom_opt"]*n.links.at["dac","efficiency"]
+
+if "Allam" in n.links.index:
+    s.loc["Allam cycle electricity capacity"] = n.links.at["Allam","p_nom_opt"]*n.links.at["Allam","efficiency"]
+    s.loc["methanol demand weighted price"] =  (n.buses_t.marginal_price["methanol"]*n.links_t.p0["Allam"]).sum()/n.links_t.p0["Allam"].sum()
+    s.loc["oxygen demand weighted price"] =  (n.buses_t.marginal_price["oxygen"]*n.links_t.p0["Allam"]).sum()/n.links_t.p0["Allam"].sum()
+
+if "CCGT" in n.links.index:
+    s.loc["CCGT electricity capacity"] = n.links.at["CCGT","p_nom_opt"]*n.links.at["CCGT","efficiency"]
+    s.loc["methanol demand weighted price"] =  (n.buses_t.marginal_price["methanol"]*n.links_t.p0["CCGT"]).sum()/n.links_t.p0["CCGT"].sum()
+
+if "methanol synthesis" in n.links.index:
+    s.loc["co2 demand weighted price"] =  (n.buses_t.marginal_price["co2"]*n.links_t.p0["methanol synthesis"]).sum()/n.links_t.p0["methanol synthesis"].sum()
+    s.loc["hydrogen demand weighted price"] =  (n.buses_t.marginal_price["hydrogen"]*n.links_t.p0["methanol synthesis"]).sum()/n.links_t.p0["methanol synthesis"].sum()
+
+if "hydrogen_turbine" in n.links.index:
+    s.loc["hydrogen demand weighted price"] =  (n.buses_t.marginal_price["hydrogen"]*n.links_t.p0["hydrogen_turbine"]).sum()/n.links_t.p0["hydrogen_turbine"].sum()
+
+
 s.loc["status"] = n.status
 
 print(s)

@@ -440,7 +440,7 @@ def run_optimisation(assumptions, pu):
                     efficiency3=-assumptions["methanolisation_co2"]*assumptions["methanolisation_efficiency"],
                     capital_cost=assumptions_df.at["methanolisation","fixed"]*assumptions["methanolisation_efficiency"]) #NB: cost is EUR/kW_MeOH
 
-    if assumptions["methanol"]:
+    if assumptions["methanol"] and not assumptions["ccgt"]:
         network.add("Link",
                     "Allam",
                     bus0="methanol",
