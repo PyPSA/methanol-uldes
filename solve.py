@@ -52,10 +52,21 @@ defaults_nt = defaults.swaplevel().loc[""]
 
 default_assumptions = pd.concat((defaults_nt,defaults_t[str(config["tech_years_default"])])).sort_index()
 
-# from https://doi.org/10.17864/1947.000321
-datasets = {"onwind0" : "data/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
-            "onwind1" : "data/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
-            "solar" : "data/NUTS_0_sp_historical.nc"}
+if "snakemake" in globals():
+    datasets = {
+        "onwind0": snakemake.input["onwind0"],
+        "onwind1": snakemake.input["onwind1"],
+        "solar":  snakemake.input["solar"],
+    }
+else:
+    # same files, but snakemake is not loaded
+    # from https://doi.org/10.17864/1947.000321
+    datasets = {
+        "onwind0": "data/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
+        "onwind1": "data/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
+        "solar": "data/ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc",
+    }
+
 
 df = {}
 
