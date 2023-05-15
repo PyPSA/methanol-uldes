@@ -19,8 +19,6 @@ import pypsa
 
 import sys
 
-from vresutils.benchmark import memory_logger
-
 import pandas as pd
 from pyomo.environ import Constraint
 
@@ -532,6 +530,8 @@ def run_optimisation(assumptions, pu):
                                       network.model["Link-p_nom"].loc["battery_discharge"] == 0,
                                       name='charger_ratio')
 
+    if "clip_p_max_pu" in config["solver_options"]:
+        network.generators_t.p_max_pu.where(lambda x: x > config["solver_options"]["clip_p_max_pu"], other=0.0, inplace=True)
 
     status, termination_condition = network.optimize.solve_model(solver_name=solver_name,
                                                                  solver_options=solver_options,
@@ -638,14 +638,8 @@ if __name__ == "__main__":
     assumptions["year_end"] = 2020
 
     print("optimising from",assumptions["year_start"],"to",assumptions["year_end"])
-
-
-    with memory_logger(filename=snakemake.log.memory, interval=30.) as mem:
-
-        n, message = run_optimisation(assumptions,pu)
-
-        n.status = message
-
-        n.export_to_netcdf(snakemake.output[0])
-
-    logger.info("Maximum memory usage: {}".format(mem.mem_usage))
+    
+    n, message = run_optimisation(assumptions,pu)
+    n.status = message
+    
+    n.export_to_netcdf(snakemake.output[0])
