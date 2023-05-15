@@ -2,8 +2,8 @@
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 HTTP = HTTPRemoteProvider()
 
-# Move files around using Python
-from shutil import move
+# Filesystem operations
+import shutil
 
 # Extract zip files
 import zipfile
@@ -36,7 +36,9 @@ rule download_timeseries:
         with zipfile.ZipFile(input[0], "r") as zf:
             for fp in fps:
                 zf.extract(fp, output_dir)
-                move(output_dir + fp, output_dir + str(Path(fp).name))
+                shutil.move(output_dir + fp, output_dir + str(Path(fp).name))
+        # Delete folders created from extracting zip file
+        shutil.rmtree("data/ERA5_data_1950-2020")
 
 rule solve_all:
     input:
@@ -99,8 +101,20 @@ rule solve:
     resources:
         mem_mb=50000,
         walltime="08:00:00"
+    benchmark:
+        "benchmarks/" + config['run'] + "/{country}-{scenario}.tsv"
     log:
         solver="logs/" + config['run'] + "/{country}-{scenario}-solver.log",
         python="logs/" + config['run'] + "/{country}-{scenario}-python.log",
         memory="logs/" + config['run'] + "/{country}-{scenario}-memory.log",
     script: "solve.py"
+
+rule plot_cost:
+    input:
+        statistics="summaries/" + config['run'] + "/statistics.csv",
+    output:
+        costs="summaries/" + config['run'] + "/costs.pdf",
+    notebook:
+        "plot_costs.py.ipynb"
+
+print("summaries/" + config['run'] + "/costs.pdf")
