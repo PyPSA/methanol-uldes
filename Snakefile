@@ -117,4 +117,24 @@ rule plot_cost:
     notebook:
         "plot_costs.py.ipynb"
 
-print("summaries/" + config['run'] + "/costs.pdf")
+rule plot_cascade:
+    input:
+        statistics="summaries/" + config['run'] + "/statistics.csv",
+    output:
+        scenarios=[
+        'summaries/'+config['run']+'/cascade-DE-71a-1H-H2u.pdf',
+        'summaries/'+config['run']+'/cascade-DE-71a-1H-H2s.pdf',
+        'summaries/'+config['run']+'/cascade-DE-71a-1H-H2s-wm-nH2t-mflex0-ramp10.pdf',
+        'summaries/'+config['run']+'/cascade-DE-71a-1H-H2s-wm-nH2t-mflex50-ramp5.pdf',
+        'summaries/'+config['run']+'/cascade-DE-71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt.pdf']
+    notebook:
+        "plot_cascade.py.ipynb"
+
+rule plot_storage_filling_level:
+    input:
+        methanol="networks/" + config['run'] + "/DE-71a-1H-H2s-wm-nH2t-mflex0-ramp10.nc",
+        hydrogen="networks/" + config['run'] + "/DE-71a-1H-H2u.nc",
+    output:
+        figure="summaries/" + config['run'] + "/storage_filling_level.pdf"
+    notebook:
+        "plot_storage_filling_level.py.ipynb"
