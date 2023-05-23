@@ -295,3 +295,19 @@ methanolisation_co2,,f,0.24800852585755315,tCO2/MWh-MeOH-LHV,Methanol synthesis 
 methanolisation_electricity,,f,0.2709488629179386,MWhel/MWh-MeOH-LHV,Methanol synthesis electricity input,"DECHEMA 2017: DECHEMA: Low carbon energy and feedstock for the European chemical industry , pg. 65."
 dac_electricity,,f,0.28,MWh/tCO2,Direct air capture electricity consumption,"Danish Energy Agency, technology_data_for_carbon_capture_transport_storage.xlsx"
 dac_heat,,f,1.5,MWh/tCO2,Direct air capture heat consumption,"Danish Energy Agency, technology_data_for_carbon_capture_transport_storage.xlsx"
+air_separation_unit_cost,2030,f,2586206,EUR/(t_O2/h),25 MUSD for 200 tpd plant -> 3e6 USD/(t_O2/h) converted to EUR using 1 USD:1.15 EUR ; alternatively from same source: 125 MUSD for 3000 tpd plant -> same calculation -> 862069 EUR/(t_O2/h),
+air_separation_unit_fom,2030,f,3.5,percent of overnight cost per year,"Based on calculation of Table 4 from http://dx.doi.org/10.1016/j.energy.2014.01.014 : 3,5080467066 = 1/(167000000/(2160496+1036263+1554395+1107284))*100 . Note: IEAGHG (https://ieaghg.org/docs/General_Docs/Reports/2015-05.pdf , pg. 14) suggest purity optimum at 97-99.5% of oxygen purity after ASU.",
+air_separation_unit_lifetime,2030,f,20,years,"http://dx.doi.org/10.1016/j.energy.2014.01.014http://dx.doi.org/10.1016/j.energy.2014.01.014 , section 4.1",
+air_separation_unit_efficiency,2030,f,3.125,tO2/MWh_el,0.32 MWh-el/tO2 from 16 MW-el for for 1200 tO2/d from https://media.path.org/documents/O2_generation_and_storage_air_separation_unit_v1.pdf,
+air_separation_unit_discount,,f,5.0,percent,Air separation unit discount rate,
+oxygen_storage_cost,2030,f,5582.6,EUR/t_O2,"TODO, currently 2x cost of co2_storage",
+oxygen_storage_fom,2030,f,1,percent of overnight cost per year,"TODO, currently 2x cost of co2_storage",
+oxygen_storage_lifetime,2030,f,25,years,"TODO, currently lifetime of co2_storage",
+oxygen_storage_discount,,f,5.0,percent,Oxygen storage discount rate,
+allam_cycle_cost,2030,f,1375,EUR/kW,"TODO, currently 1.5 costs of hydrogen_turbine; e.g. pg. 487 of https://ieaghg.org/docs/General_Docs/Reports/2015-05.pdf in table 2 listing specific costs of 1905-2000 EUR/kW (incl. ASU)",
+allam_cycle_fom,2030,f,3.35,percent of overnight cost per year,"TODO, currently same as for hydrogen_turbine",
+allam_cycle_lifetime,2030,f,25.0,years,"TODO, currently lifetime of hydrogen_turbine",
+allam_cycle_efficiency,2030,f,65,"""percent, LHV""","TODO check, hydrogen to electricity",
+allam_cycle_o2,2030,f,0.27,t_O2/MWh_el,TODO from where?,
+allam_cycle_co2_capture_efficiency,2030,f,98,percent,"TODO, check, guesstimate?",
+allam_cycle_discount,,f,5.0,percent,Allam Cycle turbine discount rate,

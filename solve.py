@@ -60,9 +60,9 @@ else:
     # same files, but snakemake is not loaded
     # from https://doi.org/10.17864/1947.000321
     datasets = {
-        "onwind0": "data/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
-        "onwind1": "data/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
-        "solar": "data/ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc",
+        "onwind0": "data/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
+        "onwind1": "data/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
+        "solar": "data/NUTS_0_sp_historical.nc",
     }
 
 
@@ -295,8 +295,8 @@ def run_optimisation(assumptions, pu):
                 bus1="oxygen",
                 carrier="air separation unit",
                 p_nom_extendable=True,
-                capital_cost=Nyears*3e5/0.32, # based on 3e6 USD / (tO2/h) invest from https://media.path.org/documents/O2_generation_and_storage_air_separation_unit_v1.pdf, see https://discord.com/channels/914472852571426846/997467578513494026
-                efficiency=1/0.32)  # 0.32 MWh-el/tO2 from 16 MW-el for for 1200 tO2/d from https://media.path.org/documents/O2_generation_and_storage_air_separation_unit_v1.pdf
+                capital_cost=assumptions_df.at["air_separation_unit","fixed"]*assumptions["air_separation_unit_efficiency"],
+                efficiency=assumptions["air_separation_unit_efficiency"])
 
     network.add("Store",
                 "oxygen storage",
@@ -304,7 +304,7 @@ def run_optimisation(assumptions, pu):
                 carrier="oxygen storage",
                 e_nom_extendable=True,
                 e_cyclic=True,
-                capital_cost=2*assumptions_df.at["co2_storage","fixed"])
+                capital_cost=assumptions_df.at["oxygen_storage","fixed"])
 
 
     if assumptions["hydrogen_load"] != 0:
@@ -458,10 +458,10 @@ def run_optimisation(assumptions, pu):
                     bus3="oxygen",
                     carrier="Allam cycle",
                     p_nom_extendable=True,
-                    efficiency=0.65,
-                    efficiency2=assumptions["methanolisation_co2"]*0.98,
-                    efficiency3=-0.27,
-                    capital_cost=1.5*assumptions_df.at["hydrogen_turbine","fixed"]*0.65)
+                    efficiency=assumptions["allam_cycle_efficiency"]/100.,
+                    efficiency2=(assumptions["allam_cycle_co2_capture_efficiency"]/100.)*assumptions["methanolisation_co2"],
+                    efficiency3=(-1)*assumptions["allam_cycle_o2"],
+                    capital_cost=assumptions_df.at["allam_cycle","fixed"]*(assumptions["allam_cycle_efficiency"]/100.))
 
     if assumptions["ccgt"]:
         network.add("Link",
@@ -515,12 +515,12 @@ def run_optimisation(assumptions, pu):
         #utility: U(d) = intercept*d - intercept/(2*load)*d^2
         #since demand is negative generator, take care with signs!
         network.generators.at["load","quadratic_coefficient"] = assumptions["elastic_intercept"]/(2*assumptions["load"])
-
+    breakpoint()
     network.consistency_check()
 
     solver_name = config["solver"]["name"]
     solver_options = config["solver_options"][config["solver"]["options"]]
-    solver_logfile = snakemake.log.solver
+    solver_logfile = snakemake.log["solver"]
 
     network.optimize.create_model()
 
@@ -559,22 +559,29 @@ if __name__ == "__main__":
     if 'snakemake' not in globals():
         from pypsa.descriptors import Dict
         import yaml
+        from types import SimpleNamespace
 
-        snakemake = Dict()
+        snakemake = SimpleNamespace()
 
         with open('config.yaml') as f:
-            snakemake.config = yaml.load(f)
+            snakemake.config = yaml.safe_load(f)
 
-        snakemake["wildcards"] = Dict({ "country" : "DE",
-                                        "scenario" : "2020"})
+        snakemake.wildcards = Dict({"country" : "DE",
+                                    # "scenario" : "71a-1H-H2s",
+                                    "scenario" : "71a-1H-H2s-wm-nH2t-mflex0-ramp10",
+                                    })
 
-        snakemake["output"] = ["results/{}-{}.nc".format(snakemake.wildcards.country,
+        snakemake.output = ["results/{}-{}.nc".format(snakemake.wildcards.country,
                                                          snakemake.wildcards.scenario)]
-
+        snakemake.log = {
+            "python": f"logs/{snakemake.wildcards['country']}-{snakemake.wildcards['scenario']}-python.log",
+            "solver": f"logs/{snakemake.wildcards['country']}-{snakemake.wildcards['scenario']}-solver.log",
+            }
+        
     country = snakemake.wildcards.country
     scenario = snakemake.wildcards.scenario
 
-    logging.basicConfig(filename=snakemake.log.python,
+    logging.basicConfig(filename=snakemake.log["python"],
                         level=snakemake.config['logging_level'])
 
 
@@ -591,6 +598,12 @@ if __name__ == "__main__":
     opts = scenario.split("-")
     if "wm" in opts:
         assumptions["methanol"] = True
+        
+        if not assumptions["ccgt"]:
+            # Default is methanol + Allam cycle
+            assumptions["air_separation_unit"] = True
+            assumptions["oxygen_storage"] = True
+            assumptions["allam_cycle_turbine"] = True
     if "wref" in opts:
         assumptions["reformer"] = True
     if "nH2t" in opts:
