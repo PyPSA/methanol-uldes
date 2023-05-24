@@ -1,18 +1,14 @@
 name: methanol-ldes
 channels:
   - bioconda
-  - gurobi
   - conda-forge
 dependencies:
   - numpy
   - pandas
   - xarray
   - pypsa
-  - snakemake
+  - snakemake-minimal
   - notebook
-  - gurobi
   - seaborn
   - matplotlib
-  - ipython
-  - ipykernel
   - nbconvert
