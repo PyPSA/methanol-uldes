@@ -138,3 +138,9 @@ rule plot_storage_filling_level:
         figure="summaries/" + config['run'] + "/storage_filling_level.pdf"
     notebook:
         "plot_storage_filling_level.py.ipynb"
+
+rule plot_all:
+    input:
+        rules.plot_cost.output,
+        rules.plot_cascade.output,
+        rules.plot_storage_filling_level.output,
