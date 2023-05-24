@@ -515,7 +515,7 @@ def run_optimisation(assumptions, pu):
         #utility: U(d) = intercept*d - intercept/(2*load)*d^2
         #since demand is negative generator, take care with signs!
         network.generators.at["load","quadratic_coefficient"] = assumptions["elastic_intercept"]/(2*assumptions["load"])
-    breakpoint()
+    
     network.consistency_check()
 
     solver_name = config["solver"]["name"]
