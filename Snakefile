@@ -114,8 +114,8 @@ rule plot_cost:
         statistics="summaries/" + config['run'] + "/statistics.csv",
     output:
         costs="summaries/" + config['run'] + "/costs.pdf",
-    notebook:
-        "plot_costs.py.ipynb"
+    script:
+        "plot_costs.py"
 
 rule plot_cascade:
     input:
@@ -127,8 +127,8 @@ rule plot_cascade:
         'summaries/'+config['run']+'/cascade-DE-71a-1H-H2s-wm-nH2t-mflex0-ramp10.pdf',
         'summaries/'+config['run']+'/cascade-DE-71a-1H-H2s-wm-nH2t-mflex50-ramp5.pdf',
         'summaries/'+config['run']+'/cascade-DE-71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt.pdf']
-    notebook:
-        "plot_cascade.py.ipynb"
+    script:
+        "plot_cascade.py"
 
 rule plot_storage_filling_level:
     input:
@@ -136,8 +136,8 @@ rule plot_storage_filling_level:
         hydrogen="networks/" + config['run'] + "/DE-71a-1H-H2u.nc",
     output:
         figure="summaries/" + config['run'] + "/storage_filling_level.pdf"
-    notebook:
-        "plot_storage_filling_level.py.ipynb"
+    script:
+        "plot_storage_filling_level.py"
 
 rule plot_all:
     input:
