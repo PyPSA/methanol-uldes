@@ -72,8 +72,11 @@ data/
 
 logs/
 
+benchmarks/
+
 *.swp
 
 summaries
 
 *.txt
+
