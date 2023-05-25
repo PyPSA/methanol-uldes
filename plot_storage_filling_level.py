@@ -60,34 +60,3 @@ fig.savefig(snakemake.output["figure"],
             transparent=True,
             bbox_inches='tight')
 
-
-# In[ ]:
-
-
-n["m"].stores_t.e["oxygen storage"].plot()
-
-
-# In[ ]:
-
-
-n["m"].stores_t.e["co2"].plot()
-
-
-# In[ ]:
-
-
-s = n["m"].stores_t.e["methanol"]
-
-fft = abs(pd.Series(np.fft.rfft(s - s.mean()),   # subtract mean!
-                    index=np.fft.rfftfreq(len(s), d=1/len(s)))**2)
-
-
-# In[ ]:
-
-
-fft.plot()
-#plt.xlim(0, 768)
-plt.xlabel('1 / 71a')
-plt.ylim(0,1e20)
-plt.xlim(0,100)
-

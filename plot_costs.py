@@ -208,9 +208,3 @@ fig.savefig(snakemake.output["costs"],
             bbox_extra_artists=(legend,),
             bbox_inches='tight')
 
-
-# In[ ]:
-
-
-costs.sum()
-

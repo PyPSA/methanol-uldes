@@ -213,15 +213,3 @@ for output_file in snakemake.output["scenarios"]:
     tp = build_tp(scenario)
     plot_fig(tp, scenario, output_file)
 
-
-# In[13]:
-
-
-tp.loc["final"]
-
-
-# In[14]:
-
-
-snakemake.output
-
