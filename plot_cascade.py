@@ -19,11 +19,14 @@ sns.set_style("ticks")
 if "snakemake" not in globals():
     # For runs outside snakemake, simple mock_snakemake
     from types import SimpleNamespace
-    folder = "summaries/230509-71a-fixasu/"
+    folder = "summaries/230527-71a-newtechdata/"
 
     member = {
         "input": {"statistics": folder+"statistics.csv"},
-        "output": {"scenarios": [folder+f"cascade-{s}.pdf" for s in ["DE-71a-1H-H2u","DE-71a-1H-H2s","DE-71a-1H-H2s-wm-nH2t-mflex0-ramp10","DE-71a-1H-H2s-wm-nH2t-mflex50-ramp5","DE-71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt"]]},
+        "output": {"scenarios": [folder+f"cascade-{s}.pdf" for s in ["DE-71a-1H-H2u","DE-71a-1H-H2s",
+                                                                     "DE-71a-1H-H2s-wm-nH2t-mflex0-ramp10",
+                                                                     "DE-71a-1H-H2s-wm-nH2t-mflex50-ramp5",
+                                                                     "DE-71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt"]]},
     }
     snakemake = SimpleNamespace(**member)
 
@@ -117,7 +120,14 @@ def build_tp(scenario):
     tp.at["demand","battery charging"] = s["battery_power share"]
 
     if "wm" in scenario:
-        tp.at["demand","LDES charging"] = s["hydrogen_electrolyser share"] + s["hydrogen_compressor share"] + s["methanol synthesis share"] + s["dac share"] + s["heat pump share"] + s["air separation unit share"]
+        tp.at["demand","LDES charging"] = (s["hydrogen_electrolyser share"] 
+                                           + s["hydrogen_compressor share"] 
+                                           + s["methanol synthesis share"]
+                                           + s["dac share"]
+                                           + s["heat pump share"]
+                                           + s["air separation unit share"]
+                                           + s["oxygen liquefaction share"]
+        )
     else:
         tp.at["demand","LDES charging"] = s["hydrogen_electrolyser share"] + s["hydrogen_compressor share"]
 
@@ -213,3 +223,5 @@ for output_file in snakemake.output["scenarios"]:
     tp = build_tp(scenario)
     plot_fig(tp, scenario, output_file)
 
+
+# %%

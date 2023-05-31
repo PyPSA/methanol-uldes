@@ -281,6 +281,10 @@ def run_optimisation(assumptions, pu):
                 "oxygen",
                 carrier="oxygen")
 
+    network.add("Bus",
+                "liquid oxygen",
+                carrier="liquid oxygen")
+
     network.add("Generator",
                 "oxygen vent",
                 bus="oxygen",
@@ -298,13 +302,39 @@ def run_optimisation(assumptions, pu):
                 capital_cost=assumptions_df.at["air_separation_unit","fixed"]*assumptions["air_separation_unit_efficiency"],
                 efficiency=assumptions["air_separation_unit_efficiency"])
 
+    network.add("Link",
+                "oxygen liquefaction",
+                bus0="oxygen",
+                bus1="liquid oxygen",
+                bus2="electricity",
+                carrier="oxygen liquefaction",
+                efficiency=1, # Perfect liquefaction of O2
+                efficiency2=-assumptions["oxygen_storage_liquefaction_efficiency"],
+                p_nom_extendable=True,
+                capital_cost=1, #Prevent storage cycling
+                marginal_cost=0.1, #Prevent storage cycling
+    )
+
+    network.add("Link",
+                "oxygen evaporation",
+                bus0="liquid oxygen",
+                bus1="oxygen",
+                carrier="oxygen evaporation",
+                efficiency=1, # Perfect evaporation; don't assume additional energy for compression for Allam cycle feed
+                p_nom_extendable=True,
+                capital_cost=1, #Prevent storage cycling
+                marginal_cost=0.1, #Prevent storage cycling
+    )
+
     network.add("Store",
                 "oxygen storage",
-                bus="oxygen",
-                carrier="oxygen storage",
+                bus="liquid oxygen",
+                carrier="liquid oxygen storage",
                 e_nom_extendable=True,
                 e_cyclic=True,
-                capital_cost=assumptions_df.at["oxygen_storage","fixed"])
+                capital_cost=assumptions_df.at["oxygen_storage","fixed"],
+                #standing_loss=np.power(assumptions["oxygen_storage_standing_loss"]/100, 1/24), # standing losses in %/day, convert to p.u./hour
+                )
 
 
     if assumptions["hydrogen_load"] != 0:
@@ -568,7 +598,8 @@ if __name__ == "__main__":
 
         snakemake.wildcards = Dict({"country" : "DE",
                                     # "scenario" : "71a-1H-H2s",
-                                    "scenario" : "71a-1H-H2s-wm-nH2t-mflex0-ramp10",
+                                    # "scenario" : "71a-1H-H2s-wm-nH2t-mflex0-ramp10",
+                                    "scenario" : "1a-1H-H2s-wm-nH2t-mflex0-ramp10",
                                     })
 
         snakemake.output = ["results/{}-{}.nc".format(snakemake.wildcards.country,

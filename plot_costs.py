@@ -24,7 +24,8 @@ preferred_order = pd.Index([
     "methanol storage",
     "methanol synthesis",
     "air separation unit",
-    "oxygen storage",
+    #"oxygen storage",
+    "liquid oxygen storage",
     "Allam cycle",
     "heat pump",
     "direct air capture",
@@ -87,7 +88,7 @@ for label, color in zip(preferred_order, cycle(colormap)):
 if "snakemake" not in globals():
     # For runs outside snakemake, simple mock_snakemake
     from types import SimpleNamespace
-    folder = "summaries/230509-71a-fixasu/"
+    folder = "summaries/230527-71a-newtechdata/"
 
     member = {
         "input": {"statistics": folder+"statistics.csv"},
@@ -154,7 +155,7 @@ costs.rename(rename_col,
              axis=1,
              inplace=True)
 
-costs = costs.drop(costs.index.intersection(["co2 vent","load","oxygen vent"]))
+costs = costs.drop(costs.index.intersection(["co2 vent","load","oxygen vent", "oxygen evaporation", "oxygen liquefaction"]))
 
 rename_s = pd.Series(index=costs.index,
                      data=[rename(i) for i in costs.index])
@@ -208,3 +209,5 @@ fig.savefig(snakemake.output["costs"],
             bbox_extra_artists=(legend,),
             bbox_inches='tight')
 
+
+# %%
