@@ -452,14 +452,39 @@ def run_optimisation(assumptions, pu):
                         marginal_cost=assumptions["biogenic_co2_price"],
                         carrier="biogenic co2")
 
+        network.add("Bus",
+                    "co2 storage",
+                    carrier="co2 storage",
+                    )
 
+        network.add("Link",
+                    "co2 liquefaction",
+                    bus0="co2",
+                    bus1="co2 storage",
+                    bus2="electricity",
+                    p_nom_extendable=True,
+                    efficiency=1,
+                    efficiency2=-1/assumptions["co2_liquefaction_efficiency"],
+                    capital_cost=assumptions_df.at["co2_liquefaction","fixed"],
+                    ) 
+        
         network.add("Store",
-                    "co2",
-                    bus="co2",
+                    "co2 storage ",
+                    bus="co2 storage",
                     carrier="co2 storage",
                     e_nom_extendable=True,
                     e_cyclic=True,
-                    capital_cost=assumptions_df.at["co2_storage","fixed"])
+                    capital_cost=assumptions_df.at["co2_storage","fixed"],
+        )
+        
+        network.add("Link",
+                    "co2 evaporation",
+                    bus0="co2 storage",
+                    bus1="co2",
+                    p_nom_extendable=True,
+                    efficiency=1,
+                    capital_cost=10., # Prevent solver shennanigans
+                    )
 
         network.add("Bus",
                      "methanol",
