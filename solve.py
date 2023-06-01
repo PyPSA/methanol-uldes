@@ -322,8 +322,19 @@ def run_optimisation(assumptions, pu):
                 carrier="oxygen evaporation",
                 efficiency=1, # Perfect evaporation; don't assume additional energy for compression for Allam cycle feed
                 p_nom_extendable=True,
-                capital_cost=1, #Prevent storage cycling
-                marginal_cost=0.1, #Prevent storage cycling
+    )
+    
+    # Later implemented via custom constraint
+    network.add("Link",
+                "oxygen storage standing losses",
+                bus0="liquid oxygen",
+                bus1="oxygen",
+                carrier="oxygen storage standing losses",
+                efficiency=1,
+                p_nom_extendable=True,
+                #Prevent storage cycling and make more expensive than intentional evaporation
+                capital_cost=10., # Prevent solver shenannigans
+                marginal_cost=0.1,
     )
 
     network.add("Store",
@@ -333,7 +344,6 @@ def run_optimisation(assumptions, pu):
                 e_nom_extendable=True,
                 e_cyclic=True,
                 capital_cost=assumptions_df.at["oxygen_storage","fixed"],
-                #standing_loss=np.power(assumptions["oxygen_storage_standing_loss"]/100, 1/24), # standing losses in %/day, convert to p.u./hour
                 )
 
 
@@ -559,6 +569,19 @@ def run_optimisation(assumptions, pu):
                                       -network.links.loc["battery_discharge", "efficiency"]*
                                       network.model["Link-p_nom"].loc["battery_discharge"] == 0,
                                       name='charger_ratio')
+    
+    if "oxygen storage standing losses" in network.links.index:
+        # standing losses in %/day, convert to p.u./hour and round to 6 decimals because higher accuracy irrelevant
+        hourly_standing_losses=np.round(1-np.power(1-assumptions["oxygen_storage_standing_loss"]/100, 1/24), 6)
+        
+        # Standing losses equivalent to state of charge of previous timestep
+        network.model.add_constraints(
+            hourly_standing_losses
+            * network.model["Store-e"].loc[np.concatenate((network.snapshots[-1:], network.snapshots[:-1])), "oxygen storage"]
+            - network.model["Link-p"].loc[:, "oxygen storage standing losses"]
+            == 0,
+            name="liquid-oxygen_standing-losses",
+        )
 
     if "clip_p_max_pu" in config["solver_options"]:
         network.generators_t.p_max_pu.where(lambda x: x > config["solver_options"]["clip_p_max_pu"], other=0.0, inplace=True)
