@@ -281,10 +281,6 @@ def run_optimisation(assumptions, pu):
                 "oxygen",
                 carrier="oxygen")
 
-    network.add("Bus",
-                "liquid oxygen",
-                carrier="liquid oxygen")
-
     network.add("Generator",
                 "oxygen vent",
                 bus="oxygen",
@@ -301,51 +297,6 @@ def run_optimisation(assumptions, pu):
                 p_nom_extendable=True,
                 capital_cost=assumptions_df.at["air_separation_unit","fixed"]*assumptions["air_separation_unit_efficiency"],
                 efficiency=assumptions["air_separation_unit_efficiency"])
-
-    network.add("Link",
-                "oxygen liquefaction",
-                bus0="oxygen",
-                bus1="liquid oxygen",
-                bus2="electricity",
-                carrier="oxygen liquefaction",
-                efficiency=1, # Perfect liquefaction of O2
-                efficiency2=-assumptions["oxygen_storage_liquefaction_efficiency"],
-                p_nom_extendable=True,
-                capital_cost=1, #Prevent storage cycling
-                marginal_cost=0.1, #Prevent storage cycling
-    )
-
-    network.add("Link",
-                "oxygen evaporation",
-                bus0="liquid oxygen",
-                bus1="oxygen",
-                carrier="oxygen evaporation",
-                efficiency=1, # Perfect evaporation; don't assume additional energy for compression for Allam cycle feed
-                p_nom_extendable=True,
-    )
-    
-    # Later implemented via custom constraint
-    network.add("Link",
-                "oxygen storage standing losses",
-                bus0="liquid oxygen",
-                bus1="oxygen",
-                carrier="oxygen storage standing losses",
-                efficiency=1,
-                p_nom_extendable=True,
-                #Prevent storage cycling and make more expensive than intentional evaporation
-                capital_cost=10., # Prevent solver shenannigans
-                marginal_cost=0.1,
-    )
-
-    network.add("Store",
-                "oxygen storage",
-                bus="liquid oxygen",
-                carrier="liquid oxygen storage",
-                e_nom_extendable=True,
-                e_cyclic=True,
-                capital_cost=assumptions_df.at["oxygen_storage","fixed"],
-                )
-
 
     if assumptions["hydrogen_load"] != 0:
         network.add("Load","hydrogen_load",
@@ -462,6 +413,7 @@ def run_optimisation(assumptions, pu):
                     bus0="co2",
                     bus1="co2 storage",
                     bus2="electricity",
+                    carrier="co2 storage",
                     p_nom_extendable=True,
                     efficiency=1,
                     efficiency2=-1/assumptions["co2_liquefaction_efficiency"],
@@ -481,9 +433,10 @@ def run_optimisation(assumptions, pu):
                     "co2 evaporation",
                     bus0="co2 storage",
                     bus1="co2",
+                    carrier="co2 storage",
                     p_nom_extendable=True,
                     efficiency=1,
-                    capital_cost=10., # Prevent solver shennanigans
+                    p_nom=1e6 #dummy value instead of capacity expansion
                     )
 
         network.add("Bus",
@@ -527,6 +480,54 @@ def run_optimisation(assumptions, pu):
                     efficiency2=(assumptions["allam_cycle_co2_capture_efficiency"]/100.)*assumptions["methanolisation_co2"],
                     efficiency3=(-1)*assumptions["allam_cycle_o2"],
                     capital_cost=assumptions_df.at["allam_cycle","fixed"]*(assumptions["allam_cycle_efficiency"]/100.))
+       
+        # Add oxygen storage in case of Allam cycle 
+        network.add("Bus",
+                "liquid oxygen",
+                carrier="oxygen storage")
+
+        network.add("Link",
+                    "oxygen liquefaction",
+                    bus0="oxygen",
+                    bus1="liquid oxygen",
+                    bus2="electricity",
+                    carrier="oxygen storage",
+                    efficiency=1, # Perfect liquefaction of O2
+                    efficiency2=-assumptions["oxygen_storage_liquefaction_efficiency"],
+                    p_nom_extendable=True,
+                    capital_cost=1, #Prevent storage cycling
+                    marginal_cost=0.1, #Prevent storage cycling
+        )
+
+        network.add("Link",
+                    "oxygen evaporation",
+                    bus0="liquid oxygen",
+                    bus1="oxygen",
+                    carrier="oxygen storage",
+                    efficiency=1, # Perfect evaporation; don't assume additional energy for compression for Allam cycle feed
+                    p_nom=1e6 #dummy value instead of capacity expansion
+        )
+        
+        # Later implemented via custom constraint
+        network.add("Link",
+                    "oxygen storage standing losses",
+                    bus0="liquid oxygen",
+                    bus1="oxygen",
+                    carrier="oxygen storage",
+                    efficiency=1,
+                    p_nom=1e6 #dummy value instead of capacity expansion
+        )
+
+        network.add("Store",
+                    "oxygen storage",
+                    bus="liquid oxygen",
+                    carrier="oxygen storage",
+                    e_nom_extendable=True,
+                    e_cyclic=True,
+                    capital_cost=assumptions_df.at["oxygen_storage","fixed"],
+                    )
+
+
 
     if assumptions["ccgt"]:
         network.add("Link",
@@ -734,4 +735,7 @@ if __name__ == "__main__":
     n, message = run_optimisation(assumptions,pu)
     n.status = message
     
-    n.export_to_netcdf(snakemake.output[0])
+    n.export_to_netcdf(snakemake.output[0],
+                       # compression of network
+                       float32=True, compression={'zlib': True, "complevel":9, "least_significant_digit":5}
+                       )
