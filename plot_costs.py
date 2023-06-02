@@ -24,8 +24,8 @@ preferred_order = pd.Index([
     "methanol storage",
     "methanol synthesis",
     "air separation unit",
-    #"oxygen storage",
-    "liquid oxygen storage",
+    "oxygen storage",
+    #"liquid oxygen storage",
     "Allam cycle",
     "heat pump",
     "direct air capture",
@@ -88,7 +88,7 @@ for label, color in zip(preferred_order, cycle(colormap)):
 if "snakemake" not in globals():
     # For runs outside snakemake, simple mock_snakemake
     from types import SimpleNamespace
-    folder = "summaries/230527-71a-newtechdata/"
+    folder = "summaries/230601-71a-liquidco2allamo2fix/"
 
     member = {
         "input": {"statistics": folder+"statistics.csv"},
@@ -135,6 +135,8 @@ def rename(name):
         return "hydrogen storage"
     elif name == "dac":
         return "direct air capture"
+    elif name in ["oxygen liquefaction", "oxygen evaporation", "oxygen storage"]:
+        return "oxygen storage"
     else:
         return name
     
@@ -155,7 +157,7 @@ costs.rename(rename_col,
              axis=1,
              inplace=True)
 
-costs = costs.drop(costs.index.intersection(["co2 vent","load","oxygen vent", "oxygen evaporation", "oxygen liquefaction"]))
+costs = costs.drop(costs.index.intersection(["co2 vent", "co2", "load", "oxygen vent", "oxygen storage standing losses"]))
 
 rename_s = pd.Series(index=costs.index,
                      data=[rename(i) for i in costs.index])
