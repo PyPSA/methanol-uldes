@@ -19,7 +19,7 @@ sns.set_style("ticks")
 if "snakemake" not in globals():
     # For runs outside snakemake, simple mock_snakemake
     from types import SimpleNamespace
-    folder = "summaries/230527-71a-newtechdata/"
+    folder = "summaries/230602-71a-compressed-networks/"
 
     member = {
         "input": {"statistics": folder+"statistics.csv"},
@@ -107,6 +107,7 @@ demand = 100
 
 def build_tp(scenario):
     s = df[scenario]
+    s = s.fillna(0.) # if technologies' shares don't exist in specific scenario
 
     tp = pd.DataFrame(dtype=float)
     tp.at["available","wind available"] = s["mean available generation wind"]/demand
