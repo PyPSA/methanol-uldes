@@ -67,9 +67,8 @@ rule summarise_network:
     input: "networks/" + config['run'] + "/{country}-{scenario}.nc"
     output: "summaries/" + config['run'] + "/statistics-{country}-{scenario}.csv"
     group: "scenario"
-    threads: 1
     resources:
-        mem_mb=2000
+        mem_mb=50000
     script: "summarise_network.py"
 
 rule balances_networks:
@@ -87,9 +86,8 @@ rule balances_network:
     input: "networks/" + config['run'] + "/{country}-{scenario}.nc"
     output: "summaries/" + config['run'] + "/balances-{country}-{scenario}.csv"
     group: "scenario"
-    threads: 1
     resources:
-        mem_mb=2000
+        mem_mb=50000
     script: "balances_network.py"
 
 
@@ -103,8 +101,7 @@ rule solve:
     group: "scenario"
     threads: 4
     resources:
-        mem_mb=50000,
-        walltime="08:00:00"
+        mem_mb=50000
     benchmark:
         "benchmarks/" + config['run'] + "/{country}-{scenario}.tsv"
     log:
