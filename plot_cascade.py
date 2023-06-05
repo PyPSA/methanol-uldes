@@ -125,6 +125,7 @@ def build_tp(scenario):
                                            + s["hydrogen_compressor share"] 
                                            + s["methanol synthesis share"]
                                            + s["dac share"]
+                                           + s["co2 liquefaction share"]
                                            + s["heat pump share"]
                                            + s["air separation unit share"]
                                            + s["oxygen liquefaction share"]

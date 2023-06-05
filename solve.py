@@ -413,7 +413,7 @@ def run_optimisation(assumptions, pu):
                     bus0="co2",
                     bus1="co2 storage",
                     bus2="electricity",
-                    carrier="co2 storage",
+                    carrier="co2 liquefaction",
                     p_nom_extendable=True,
                     efficiency=1,
                     efficiency2=-1/assumptions["co2_liquefaction_efficiency"],
@@ -433,7 +433,7 @@ def run_optimisation(assumptions, pu):
                     "co2 evaporation",
                     bus0="co2 storage",
                     bus1="co2",
-                    carrier="co2 storage",
+                    carrier="co2 evaporation",
                     p_nom_extendable=True,
                     efficiency=1,
                     p_nom=1e6 #dummy value instead of capacity expansion
@@ -491,7 +491,7 @@ def run_optimisation(assumptions, pu):
                     bus0="oxygen",
                     bus1="liquid oxygen",
                     bus2="electricity",
-                    carrier="oxygen storage",
+                    carrier="oxygen liquefaction",
                     efficiency=1, # Perfect liquefaction of O2
                     efficiency2=-assumptions["oxygen_storage_liquefaction_efficiency"],
                     p_nom_extendable=True,
@@ -503,7 +503,7 @@ def run_optimisation(assumptions, pu):
                     "oxygen evaporation",
                     bus0="liquid oxygen",
                     bus1="oxygen",
-                    carrier="oxygen storage",
+                    carrier="oxygen evaporation",
                     efficiency=1, # Perfect evaporation; don't assume additional energy for compression for Allam cycle feed
                     p_nom=1e6 #dummy value instead of capacity expansion
         )
@@ -513,7 +513,7 @@ def run_optimisation(assumptions, pu):
                     "oxygen storage standing losses",
                     bus0="liquid oxygen",
                     bus1="oxygen",
-                    carrier="oxygen storage",
+                    carrier="oxygen storage standing losses",
                     efficiency=1,
                     p_nom=1e6 #dummy value instead of capacity expansion
         )

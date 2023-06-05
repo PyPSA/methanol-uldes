@@ -137,6 +137,8 @@ def rename(name):
         return "direct air capture"
     elif name in ["oxygen liquefaction", "oxygen evaporation", "oxygen storage"]:
         return "oxygen storage"
+    elif name in ["co2 liquefaction", "co2 evaporation", "co2 storage"]:
+        return "co2 storage"
     else:
         return name
     
@@ -157,7 +159,7 @@ costs.rename(rename_col,
              axis=1,
              inplace=True)
 
-costs = costs.drop(costs.index.intersection(["co2 vent", "co2", "load", "oxygen vent", "oxygen storage standing losses"]))
+costs = costs.drop(costs.index.intersection(["co2 vent", "load", "oxygen vent", "oxygen storage standing losses"]))
 
 rename_s = pd.Series(index=costs.index,
                      data=[rename(i) for i in costs.index])
