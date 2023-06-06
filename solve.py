@@ -416,10 +416,10 @@ def run_optimisation(assumptions, pu):
                     carrier="co2 liquefaction",
                     p_nom_extendable=True,
                     efficiency=1,
-                    efficiency2=-1/assumptions["co2_liquefaction_efficiency"],
+                    efficiency2=-assumptions["co2_liquefaction_efficiency"],
                     capital_cost=assumptions_df.at["co2_liquefaction","fixed"],
-                    ) 
-        
+                    )
+
         network.add("Store",
                     "co2 storage ",
                     bus="co2 storage",
@@ -428,13 +428,13 @@ def run_optimisation(assumptions, pu):
                     e_cyclic=True,
                     capital_cost=assumptions_df.at["co2_storage","fixed"],
         )
-        
+
         network.add("Link",
                     "co2 evaporation",
                     bus0="co2 storage",
                     bus1="co2",
                     carrier="co2 evaporation",
-                    p_nom_extendable=True,
+                    p_nom_extendable=False,
                     efficiency=1,
                     p_nom=1e6 #dummy value instead of capacity expansion
                     )
@@ -480,8 +480,8 @@ def run_optimisation(assumptions, pu):
                     efficiency2=(assumptions["allam_cycle_co2_capture_efficiency"]/100.)*assumptions["methanolisation_co2"],
                     efficiency3=(-1)*assumptions["allam_cycle_o2"],
                     capital_cost=assumptions_df.at["allam_cycle","fixed"]*(assumptions["allam_cycle_efficiency"]/100.))
-       
-        # Add oxygen storage in case of Allam cycle 
+
+        # Add oxygen storage in case of Allam cycle
         network.add("Bus",
                 "liquid oxygen",
                 carrier="oxygen storage")
@@ -507,7 +507,7 @@ def run_optimisation(assumptions, pu):
                     efficiency=1, # Perfect evaporation; don't assume additional energy for compression for Allam cycle feed
                     p_nom=1e6 #dummy value instead of capacity expansion
         )
-        
+
         # Later implemented via custom constraint
         network.add("Link",
                     "oxygen storage standing losses",
@@ -581,7 +581,7 @@ def run_optimisation(assumptions, pu):
         #utility: U(d) = intercept*d - intercept/(2*load)*d^2
         #since demand is negative generator, take care with signs!
         network.generators.at["load","quadratic_coefficient"] = assumptions["elastic_intercept"]/(2*assumptions["load"])
-    
+
     network.consistency_check()
 
     solver_name = config["solver"]["name"]
@@ -595,11 +595,11 @@ def run_optimisation(assumptions, pu):
                                       -network.links.loc["battery_discharge", "efficiency"]*
                                       network.model["Link-p_nom"].loc["battery_discharge"] == 0,
                                       name='charger_ratio')
-    
+
     if "oxygen storage standing losses" in network.links.index:
         # standing losses in %/day, convert to p.u./hour and round to 6 decimals because higher accuracy irrelevant
         hourly_standing_losses=np.round(1-np.power(1-assumptions["oxygen_storage_standing_loss"]/100, 1/24), 6)
-        
+
         # Standing losses equivalent to state of charge of previous timestep
         network.model.add_constraints(
             hourly_standing_losses
@@ -657,7 +657,7 @@ if __name__ == "__main__":
             "python": f"logs/{snakemake.wildcards['country']}-{snakemake.wildcards['scenario']}-python.log",
             "solver": f"logs/{snakemake.wildcards['country']}-{snakemake.wildcards['scenario']}-solver.log",
             }
-        
+
     country = snakemake.wildcards.country
     scenario = snakemake.wildcards.scenario
 
@@ -678,7 +678,7 @@ if __name__ == "__main__":
     opts = scenario.split("-")
     if "wm" in opts:
         assumptions["methanol"] = True
-        
+
         if not assumptions["ccgt"]:
             # Default is methanol + Allam cycle
             assumptions["air_separation_unit"] = True
@@ -731,10 +731,10 @@ if __name__ == "__main__":
     assumptions["year_end"] = 2020
 
     print("optimising from",assumptions["year_start"],"to",assumptions["year_end"])
-    
+
     n, message = run_optimisation(assumptions,pu)
     n.status = message
-    
+
     n.export_to_netcdf(snakemake.output[0],
                        # compression of network
                        float32=True, compression={'zlib': True, "complevel":9, "least_significant_digit":5}
