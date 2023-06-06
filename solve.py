@@ -77,6 +77,12 @@ for key,value in datasets.items():
                            index=snapshots,
                            columns=ds["NUTS_keys"].values)
 
+ds = xr.open_dataset(snakemake.input.temperature)
+df["temperature"] = pd.DataFrame(data=ds["detrended_data"][:,4,:].T,
+                                 index=snapshots,
+                                 columns=ds["NUTS_keys"].values)
+
+
 current_version = config["current_version"]
 
 octant_folder = config["octant_folder"]
@@ -187,6 +193,13 @@ def run_optimisation(assumptions, pu):
     network.add("Bus","electricity",
                 carrier="electricity")
 
+    load = assumptions["load"]
+    if assumptions["temperature_demand"]:
+        tdep_demand = config["degree_cutoff"] - df["temperature"][country]
+        tdep_demand[tdep_demand < 0.] = 0.
+        load += (assumptions["temperature_demand_mean"]/tdep_demand.mean())*tdep_demand
+
+
     if assumptions["voll"]:
         network.add("Generator","load",
                     bus="electricity",
@@ -207,7 +220,7 @@ def run_optimisation(assumptions, pu):
         network.add("Load","load",
                     bus="electricity",
                     carrier="load",
-                    p_set=assumptions["load"])
+                    p_set=load)
 
     if assumptions["solar"]:
         network.add("Generator","solar",
@@ -683,6 +696,7 @@ if __name__ == "__main__":
     assumptions = default_assumptions["value"].to_dict()
     assumptions["ramp"] = np.nan
     assumptions["meohsource"] = False
+    assumptions["temperature_demand"] = False
 
     opts = scenario.split("-")
     if "wm" in opts:
@@ -736,6 +750,9 @@ if __name__ == "__main__":
         if opt[:10] == "meohsource":
             assumptions["meohsource"] = True
             assumptions["meohsource_marginal_cost"] = float(opt[10:])
+        if opt[:7] == "tdemand":
+            assumptions["temperature_demand"] = True
+            assumptions["temperature_demand_mean"] = float(opt[7:])
 
     years = int(opts[0][:-1])
     print(years,"years to optimise")
