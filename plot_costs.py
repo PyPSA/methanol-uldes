@@ -31,6 +31,7 @@ preferred_order = pd.Index([
     "direct air capture",
     "co2 storage",
     "CCGT",
+    "methanol source",
     ])
 
 # with open("../../efuels-server/config.yaml", "r") as f:
@@ -53,7 +54,7 @@ preferred_order = pd.Index([
 # colors = {
 #     "CCGT": "#000000",
 #     "Allam cycle": "#000000",
-#     "hydrogen turbine": "#000000",   
+#     "hydrogen turbine": "#000000",
 #     "oxygen storage": "#b4baea",
 #     "air separation unit": "#586da6",
 #     "heat pump": "#b4baea",
@@ -141,13 +142,13 @@ def rename(name):
         return "co2 storage"
     else:
         return name
-    
+
 def rename_col(name):
     name = name.replace("-3a","").replace("-71a","").replace("-10a","").replace("H2s-wm-nH2t","MeOH").replace("-1H","").replace("mflex50-ramp5","lowflex").replace("mflex0-ramp10","highflex")
     name = name.replace("highflex-ccgt","CCGT")
     name = name.replace("-","\n")
     return name
-    
+
 costs = df.loc[df.index[df.index.str.contains("totex")]].multiply(1/df.loc["total_load"],axis=1)
 
 
@@ -174,6 +175,7 @@ costs = costs.loc[new_index]
 #print(costs)
 
 costs.T.plot(kind="bar",stacked=True,color=[colors[i] for i in costs.index],
+             linewidth=0,
              ax=ax,
              rot=0)
 

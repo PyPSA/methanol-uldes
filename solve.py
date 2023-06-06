@@ -421,7 +421,7 @@ def run_optimisation(assumptions, pu):
                     )
 
         network.add("Store",
-                    "co2 storage ",
+                    "co2 storage",
                     bus="co2 storage",
                     carrier="co2 storage",
                     e_nom_extendable=True,
@@ -466,6 +466,14 @@ def run_optimisation(assumptions, pu):
                     efficiency2=-assumptions["methanolisation_electricity"]*assumptions["methanolisation_efficiency"],
                     efficiency3=-assumptions["methanolisation_co2"]*assumptions["methanolisation_efficiency"],
                     capital_cost=assumptions_df.at["methanolisation","fixed"]*assumptions["methanolisation_efficiency"]) #NB: cost is EUR/kW_MeOH
+
+        if assumptions["meohsource"]:
+            network.add("Generator",
+                        "methanol source",
+                        bus="methanol",
+                        p_nom=1e6,
+                        marginal_cost=assumptions["meohsource_marginal_cost"],#60 mimics 50 EUR/MWh LNG + 50 EUR/tCO2 CCS OR v. cheap clean MeOH
+                        carrier="methanol source")
 
     if assumptions["methanol"] and not assumptions["ccgt"]:
         network.add("Link",
@@ -674,6 +682,7 @@ if __name__ == "__main__":
 
     assumptions = default_assumptions["value"].to_dict()
     assumptions["ramp"] = np.nan
+    assumptions["meohsource"] = False
 
     opts = scenario.split("-")
     if "wm" in opts:
@@ -724,6 +733,9 @@ if __name__ == "__main__":
             assumptions["elastic_intercept"] = float(opt[7:])
         if opt[:4] == "ramp":
             assumptions["ramp"] = float(opt[4:])/100
+        if opt[:10] == "meohsource":
+            assumptions["meohsource"] = True
+            assumptions["meohsource_marginal_cost"] = float(opt[10:])
 
     years = int(opts[0][:-1])
     print(years,"years to optimise")
