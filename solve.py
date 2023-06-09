@@ -77,6 +77,12 @@ for key,value in datasets.items():
                            index=snapshots,
                            columns=ds["NUTS_keys"].values)
 
+ds = xr.open_dataset(snakemake.input.temperature)
+df["temperature"] = pd.DataFrame(data=ds["detrended_data"][:,4,:].T,
+                                 index=snapshots,
+                                 columns=ds["NUTS_keys"].values)
+
+
 current_version = config["current_version"]
 
 octant_folder = config["octant_folder"]
@@ -187,6 +193,13 @@ def run_optimisation(assumptions, pu):
     network.add("Bus","electricity",
                 carrier="electricity")
 
+    load = assumptions["load"]
+    if assumptions["temperature_demand"]:
+        tdep_demand = config["degree_cutoff"] - df["temperature"][country]
+        tdep_demand[tdep_demand < 0.] = 0.
+        load += (assumptions["temperature_demand_mean"]/tdep_demand.mean())*tdep_demand
+
+
     if assumptions["voll"]:
         network.add("Generator","load",
                     bus="electricity",
@@ -207,7 +220,7 @@ def run_optimisation(assumptions, pu):
         network.add("Load","load",
                     bus="electricity",
                     carrier="load",
-                    p_set=assumptions["load"])
+                    p_set=load)
 
     if assumptions["solar"]:
         network.add("Generator","solar",
@@ -416,25 +429,25 @@ def run_optimisation(assumptions, pu):
                     carrier="co2 liquefaction",
                     p_nom_extendable=True,
                     efficiency=1,
-                    efficiency2=-1/assumptions["co2_liquefaction_efficiency"],
+                    efficiency2=-assumptions["co2_liquefaction_efficiency"],
                     capital_cost=assumptions_df.at["co2_liquefaction","fixed"],
-                    ) 
-        
+                    )
+
         network.add("Store",
-                    "co2 storage ",
+                    "co2 storage",
                     bus="co2 storage",
                     carrier="co2 storage",
                     e_nom_extendable=True,
                     e_cyclic=True,
                     capital_cost=assumptions_df.at["co2_storage","fixed"],
         )
-        
+
         network.add("Link",
                     "co2 evaporation",
                     bus0="co2 storage",
                     bus1="co2",
                     carrier="co2 evaporation",
-                    p_nom_extendable=True,
+                    p_nom_extendable=False,
                     efficiency=1,
                     p_nom=1e6 #dummy value instead of capacity expansion
                     )
@@ -467,6 +480,14 @@ def run_optimisation(assumptions, pu):
                     efficiency3=-assumptions["methanolisation_co2"]*assumptions["methanolisation_efficiency"],
                     capital_cost=assumptions_df.at["methanolisation","fixed"]*assumptions["methanolisation_efficiency"]) #NB: cost is EUR/kW_MeOH
 
+        if assumptions["meohsource"]:
+            network.add("Generator",
+                        "methanol source",
+                        bus="methanol",
+                        p_nom=1e6,
+                        marginal_cost=assumptions["meohsource_marginal_cost"],#60 mimics 50 EUR/MWh LNG + 50 EUR/tCO2 CCS OR v. cheap clean MeOH
+                        carrier="methanol source")
+
     if assumptions["methanol"] and not assumptions["ccgt"]:
         network.add("Link",
                     "Allam",
@@ -480,8 +501,8 @@ def run_optimisation(assumptions, pu):
                     efficiency2=(assumptions["allam_cycle_co2_capture_efficiency"]/100.)*assumptions["methanolisation_co2"],
                     efficiency3=(-1)*assumptions["allam_cycle_o2"],
                     capital_cost=assumptions_df.at["allam_cycle","fixed"]*(assumptions["allam_cycle_efficiency"]/100.))
-       
-        # Add oxygen storage in case of Allam cycle 
+
+        # Add oxygen storage in case of Allam cycle
         network.add("Bus",
                 "liquid oxygen",
                 carrier="oxygen storage")
@@ -507,7 +528,7 @@ def run_optimisation(assumptions, pu):
                     efficiency=1, # Perfect evaporation; don't assume additional energy for compression for Allam cycle feed
                     p_nom=1e6 #dummy value instead of capacity expansion
         )
-        
+
         # Later implemented via custom constraint
         network.add("Link",
                     "oxygen storage standing losses",
@@ -581,7 +602,7 @@ def run_optimisation(assumptions, pu):
         #utility: U(d) = intercept*d - intercept/(2*load)*d^2
         #since demand is negative generator, take care with signs!
         network.generators.at["load","quadratic_coefficient"] = assumptions["elastic_intercept"]/(2*assumptions["load"])
-    
+
     network.consistency_check()
 
     solver_name = config["solver"]["name"]
@@ -595,11 +616,11 @@ def run_optimisation(assumptions, pu):
                                       -network.links.loc["battery_discharge", "efficiency"]*
                                       network.model["Link-p_nom"].loc["battery_discharge"] == 0,
                                       name='charger_ratio')
-    
+
     if "oxygen storage standing losses" in network.links.index:
         # standing losses in %/day, convert to p.u./hour and round to 6 decimals because higher accuracy irrelevant
         hourly_standing_losses=np.round(1-np.power(1-assumptions["oxygen_storage_standing_loss"]/100, 1/24), 6)
-        
+
         # Standing losses equivalent to state of charge of previous timestep
         network.model.add_constraints(
             hourly_standing_losses
@@ -657,7 +678,7 @@ if __name__ == "__main__":
             "python": f"logs/{snakemake.wildcards['country']}-{snakemake.wildcards['scenario']}-python.log",
             "solver": f"logs/{snakemake.wildcards['country']}-{snakemake.wildcards['scenario']}-solver.log",
             }
-        
+
     country = snakemake.wildcards.country
     scenario = snakemake.wildcards.scenario
 
@@ -674,11 +695,13 @@ if __name__ == "__main__":
 
     assumptions = default_assumptions["value"].to_dict()
     assumptions["ramp"] = np.nan
+    assumptions["meohsource"] = False
+    assumptions["temperature_demand"] = False
 
     opts = scenario.split("-")
     if "wm" in opts:
         assumptions["methanol"] = True
-        
+
         if not assumptions["ccgt"]:
             # Default is methanol + Allam cycle
             assumptions["air_separation_unit"] = True
@@ -724,6 +747,12 @@ if __name__ == "__main__":
             assumptions["elastic_intercept"] = float(opt[7:])
         if opt[:4] == "ramp":
             assumptions["ramp"] = float(opt[4:])/100
+        if opt[:10] == "meohsource":
+            assumptions["meohsource"] = True
+            assumptions["meohsource_marginal_cost"] = float(opt[10:])
+        if opt[:7] == "tdemand":
+            assumptions["temperature_demand"] = True
+            assumptions["temperature_demand_mean"] = float(opt[7:])
 
     years = int(opts[0][:-1])
     print(years,"years to optimise")
@@ -731,10 +760,10 @@ if __name__ == "__main__":
     assumptions["year_end"] = 2020
 
     print("optimising from",assumptions["year_start"],"to",assumptions["year_end"])
-    
+
     n, message = run_optimisation(assumptions,pu)
     n.status = message
-    
+
     n.export_to_netcdf(snakemake.output[0],
                        # compression of network
                        float32=True, compression={'zlib': True, "complevel":9, "least_significant_digit":5}

@@ -24,12 +24,14 @@ rule download_timeseries:
         solar="data/NUTS_0_sp_historical.nc",
         onwind0="data/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
         onwind1="data/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
+	temperature="data/NUTS_0_t2m_detrended_timeseries_historical_pop_weighted.nc",
     run:
         # Files to extract
         fps = [
             "ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc",
             "ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
             "ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
+	    "ERA5_data_1950-2020/t2m/NUTS_0_t2m_detrended_timeseries_historical_pop_weighted.nc",
         ]
         # extract and move files to this dir
         output_dir = "data/"
@@ -96,6 +98,7 @@ rule solve:
         solar=rules.download_timeseries.output.solar,
         onwind0=rules.download_timeseries.output.onwind0,
         onwind1=rules.download_timeseries.output.onwind1,
+	temperature=rules.download_timeseries.output.temperature,
     output:
         "networks/" + config['run'] + "/{country}-{scenario}.nc"
     group: "scenario"

@@ -4,13 +4,13 @@
 #20a counts back from 2020
 #H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
 
-run: "230602-71a-updated-MeOH-efficiencies"
+run: "230606-71a-1H-tdemand40"
 
 logging_level: INFO
 
 run_settings:
   country: [UK,DE,ES]
-  scenario: [71a-1H-H2s,71a-1H-H2u,71a-1H-H2s-wm-nH2t-mflex50-ramp5,71a-1H-H2s-wm-nH2t-mflex0-ramp10,71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt]
+  scenario: [71a-1H-H2s-tdemand40,71a-1H-H2u-tdemand40,71a-1H-H2s-wm-nH2t-mflex50-ramp5-tdemand40,71a-1H-H2s-wm-nH2t-mflex0-ramp10-tdemand40,71a-1H-H2s-wm-nH2t-mflex0-ramp10-meohsource40-tdemand40,71a-1H-H2s-wm-nH2t-mflex0-ramp10-meohsource60-tdemand40,71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt-tdemand40]
 
 current_version: 190929
 
@@ -28,7 +28,7 @@ cost_year_assumptions: 2015
 cost_year: 2020
 inflation: 2
 
-
+degree_cutoff: 17 #temperature in celsius below which there is heating demand
 
 float_upper_limit: 1.e+7
 
@@ -117,3 +117,4 @@ colors:
   methanol synthesis: "#F08080"
   methanol storage: black
   Allam cycle: pink
+  methanol source: magenta
