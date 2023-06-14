@@ -92,6 +92,18 @@ rule balances_network:
         mem_mb=50000
     script: "balances_network.py"
 
+rule get_fillings:
+    input:
+        expand("filling/" + config['run'] + "/filling-{country}-{scenario}.csv",
+            **config['run_settings'])
+
+rule get_filling:
+    input: "networks/" + config['run'] + "/{country}-{scenario}.nc"
+    output: "filling/" + config['run'] + "/filling-{country}-{scenario}.csv"
+    group: "scenario"
+    resources:
+        mem_mb=50000
+    script: "get_filling.py"
 
 rule solve:
     input:
