@@ -396,7 +396,7 @@ def run_optimisation(assumptions, pu):
                     bus2="heat",
                     carrier="dac",
                     p_nom_extendable=True,
-                    capital_cost=assumptions_df.at["dac","fixed"]/assumptions["dac_electricity"],
+                    capital_cost=assumptions["dac_factor"]*assumptions_df.at["dac","fixed"]/assumptions["dac_electricity"],
                     efficiency=1/assumptions["dac_electricity"],
                     efficiency2=-assumptions["dac_heat"]/assumptions["dac_electricity"])
 
@@ -697,6 +697,7 @@ if __name__ == "__main__":
     assumptions["ramp"] = np.nan
     assumptions["meohsource"] = False
     assumptions["temperature_demand"] = False
+    assumptions["dac_factor"] = 1.
 
     opts = scenario.split("-")
     if "wm" in opts:
@@ -753,6 +754,11 @@ if __name__ == "__main__":
         if opt[:7] == "tdemand":
             assumptions["temperature_demand"] = True
             assumptions["temperature_demand_mean"] = float(opt[7:])
+        if opt[:3] == "dac":
+            assumptions["dac_factor"] = float(opt[3:])
+        if opt[:10] == "saltcavern" and "H2u" in opts:
+            assumptions["hydrogen_energy_cost"] = float(opt[10:].replace("p","."))
+            print("changing salt cavern cost to",assumptions["hydrogen_energy_cost"])
 
     years = int(opts[0][:-1])
     print(years,"years to optimise")
