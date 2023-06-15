@@ -40,9 +40,9 @@ if "snakemake" not in globals():
         #   "solar available": "#FFBF00",
         #   "solar used" : "#FFEA00",
         #   "solar curtailed" : "#FFFAA0",
-        #   "battery charging" : "#696969",
+        #   "battery charging" : "#8b8b8b",
         #   "battery discharging" : "#BEBEBE",
-        #   "LDES charging" : "#c71585",
+        #   "LDES charging" : "#ed179d",
         #   "LDES discharging" : "#ff77ff",
         #   "direct supply" : "g",
         #  }
@@ -125,6 +125,7 @@ def build_tp(scenario):
                                            + s["hydrogen_compressor share"] 
                                            + s["methanol synthesis share"]
                                            + s["dac share"]
+                                           + s["co2 compression share"]
                                            + s["co2 liquefaction share"]
                                            + s["heat pump share"]
                                            + s["air separation unit share"]

@@ -415,28 +415,48 @@ def run_optimisation(assumptions, pu):
                         p_nom=1e6,
                         marginal_cost=assumptions["biogenic_co2_price"],
                         carrier="biogenic co2")
+        
+        # Intermediary bus for pressure conversion before CO2 liquefaction
+        network.add("Bus",
+                    "co2 high pressure",
+                    carrier="co2 high pressure")
+       
+        # Intermediary link; assume difference in liquefaction between low and high pressure for efficiency and cost 
+        # Reason: DAC CO2 output is assumed to be at low pressure and requires pressure increase
+        # Allam cycle CO2 output is assumed to be at high pressure and does not require pressure increase
+        network.add("Link",
+                    "co2 compression",
+                    carrier="co2 compression",
+                    bus0="co2",
+                    bus1="co2 high pressure",
+                    bus2="electricity",
+                    efficiency=1,
+                    efficiency2=-assumptions["co2_liquefaction_efficiency"]+assumptions["co2_liquefaction_high_pressure_efficiency"],
+                    p_nom_extendable=True,
+                    capital_cost=assumptions_df.at["co2_liquefaction","fixed"] - assumptions_df.at["co2_liquefaction_high_pressure","fixed"],
+                    )
 
         network.add("Bus",
-                    "co2 storage",
-                    carrier="co2 storage",
+                    "co2 liquid storage",
+                    carrier="co2 liquid storage",
                     )
 
         network.add("Link",
                     "co2 liquefaction",
-                    bus0="co2",
-                    bus1="co2 storage",
+                    bus0="co2 high pressure",
+                    bus1="co2 liquid storage",
                     bus2="electricity",
                     carrier="co2 liquefaction",
                     p_nom_extendable=True,
                     efficiency=1,
-                    efficiency2=-assumptions["co2_liquefaction_efficiency"],
-                    capital_cost=assumptions_df.at["co2_liquefaction","fixed"],
+                    efficiency2=-assumptions["co2_liquefaction_high_pressure_efficiency"],
+                    capital_cost=assumptions_df.at["co2_liquefaction_high_pressure","fixed"],
                     )
 
         network.add("Store",
-                    "co2 storage",
-                    bus="co2 storage",
-                    carrier="co2 storage",
+                    "co2 liquid storage",
+                    bus="co2 liquid storage",
+                    carrier="co2 liquid storage",
                     e_nom_extendable=True,
                     e_cyclic=True,
                     capital_cost=assumptions_df.at["co2_storage","fixed"],
@@ -444,7 +464,7 @@ def run_optimisation(assumptions, pu):
 
         network.add("Link",
                     "co2 evaporation",
-                    bus0="co2 storage",
+                    bus0="co2 liquid storage",
                     bus1="co2",
                     carrier="co2 evaporation",
                     p_nom_extendable=False,
@@ -493,7 +513,7 @@ def run_optimisation(assumptions, pu):
                     "Allam",
                     bus0="methanol",
                     bus1="electricity",
-                    bus2="co2",
+                    bus2="co2 high pressure",
                     bus3="oxygen",
                     carrier="Allam cycle",
                     p_nom_extendable=True,

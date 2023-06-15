@@ -138,7 +138,7 @@ def rename(name):
         return "direct air capture"
     elif name in ["oxygen liquefaction", "oxygen evaporation", "oxygen storage"]:
         return "oxygen storage"
-    elif name in ["co2 liquefaction", "co2 evaporation", "co2 storage"]:
+    elif name in ["co2 compression", "co2 liquefaction", "co2 evaporation", "co2 liquid storage"]:
         return "co2 storage"
     else:
         return name
