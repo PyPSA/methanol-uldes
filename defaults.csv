@@ -131,6 +131,14 @@ hydrogen_energy_lifetime,2040,f,100.0,years,Hydrogen underground salt cavern sto
 hydrogen_energy_cost,2050,f,1.3,EUR/kWh,Hydrogen underground salt cavern storage capital cost (overnight),"Danish Energy Agency, technology_data_catalogue_for_energy_storage.xlsx"
 hydrogen_energy_fom,2050,f,0.0,percent of overnight cost per year,Hydrogen underground salt cavern storage fixed operation and maintenance costs,"Danish Energy Agency, technology_data_catalogue_for_energy_storage.xlsx"
 hydrogen_energy_lifetime,2050,f,100.0,years,Hydrogen underground salt cavern storage lifetime,"Danish Energy Agency, technology_data_catalogue_for_energy_storage.xlsx"
+hydrogen_storage_cavern_discount,,f,5,percent,Hydrogen underground salt cavern storage discount rate,
+hydrogen_storage_cavern_cost,2030,f,2.2,EUR/kWh,Hydrogen underground salt cavern storage capital cost (overnight),"Danish Energy Agency, technology_data_catalogue_for_energy_storage.xlsx"
+hydrogen_storage_cavern_fom,2030,f,0,percent of overnight cost per year,Hydrogen underground salt cavern storage fixed operation and maintenance costs,"Danish Energy Agency, technology_data_catalogue_for_energy_storage.xlsx"
+hydrogen_storage_cavern_lifetime,2030,f,100,years,Hydrogen underground salt cavern storage lifetime,"Danish Energy Agency, technology_data_catalogue_for_energy_storage.xlsx"
+hydrogen_storage_tank_discount,,f,5,percent,Hydrogen storage tank discount rate,
+hydrogen_storage_tank_cost,2030,f,13.5,EUR/kWh,"450 EUR/kg_H2 converted with LHV to MWh. For a type 1 hydrogen storage tank (steel, 15-250 bar). Currency year assumed 2020 for initial publication of reference; observe note in SI.4.3 that no currency year is explicitly stated in the reference. ","Based on Stöckl et al (2021): https://doi.org/10.48550/arXiv.2005.03464, table SI.9. "
+hydrogen_storage_tank_fom,2030,f,2,percent of overnight cost per year,,"Based on Stöckl et al (2021): https://doi.org/10.48550/arXiv.2005.03464, table SI.9. "
+hydrogen_storage_tank_lifetime,2030,f,20,years,,"Based on Stöckl et al (2021): https://doi.org/10.48550/arXiv.2005.03464, table SI.9. "
 hydrogen_turbine_discount,,f,5,percent,Hydrogen combined cycle turbine discount rate,
 hydrogen_turbine_cost,2020,f,971.6,EUR/kW,Hydrogen combined cycle turbine capital cost (overnight),"Danish Energy Agency, technology_data_for_el_and_dh.xlsx"
 hydrogen_turbine_fom,2020,f,3.33,percent of overnight cost per year,Hydrogen combined cycle turbine fixed operation and maintenance costs,"Danish Energy Agency, technology_data_for_el_and_dh.xlsx"

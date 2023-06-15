@@ -154,7 +154,7 @@ threshold = 0.1
 
 
 
-def run_optimisation(assumptions, pu):
+def run_optimisation(assumptions, pu, scenario_opts):
     """Needs cleaned-up assumptions and pu.
     return results_overview, results_series, error_msg"""
 
@@ -356,7 +356,8 @@ def run_optimisation(assumptions, pu):
                 carrier="hydrogen storage",
                 e_nom_extendable=True,
                 e_cyclic=True,
-                capital_cost=assumptions_df.at["hydrogen_energy","fixed"])
+                capital_cost=assumptions_df.at["hydrogen_storage_tank","fixed"] if "H2s" in scenario_opts else assumptions_df.at["hydrogen_storage_cavern","fixed"],
+                )
 
 
     if assumptions["hydrogen"]:
@@ -738,11 +739,9 @@ if __name__ == "__main__":
     if "ocgt" in opts:
         assumptions["ocgt"] = True
     if "H2s" in opts:
-        assumptions["hydrogen_energy_cost"] = 13
-        assumptions["hydrogen_energy_fom"] = 2
-        assumptions["hydrogen_energy_lifetime"] = 20
+        assumptions["hydrogen_storage_tank"] = True
     elif "H2u" in opts:
-        pass
+        assumptions["hydrogen_storage_cavern"] = True
     else:
         print("no H2 storage defined")
         sys.exit()
@@ -781,7 +780,7 @@ if __name__ == "__main__":
 
     print("optimising from",assumptions["year_start"],"to",assumptions["year_end"])
 
-    n, message = run_optimisation(assumptions,pu)
+    n, message = run_optimisation(assumptions,pu,opts)
     n.status = message
 
     n.export_to_netcdf(snakemake.output[0],
