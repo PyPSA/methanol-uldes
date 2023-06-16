@@ -1,16 +1,24 @@
-
 #scenario: see solve.py
 #first argument must be #years
 #20a counts back from 2020
 #H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
 
-run: "230606-71a-1H-tdemand40"
+run: "230616-71H-1a-CO22stageliquefaction"
 
 logging_level: INFO
 
 run_settings:
-  country: [UK,DE,ES]
-  scenario: [71a-1H-H2s-tdemand40,71a-1H-H2u-tdemand40,71a-1H-H2s-wm-nH2t-mflex50-ramp5-tdemand40,71a-1H-H2s-wm-nH2t-mflex0-ramp10-tdemand40,71a-1H-H2s-wm-nH2t-mflex0-ramp10-meohsource40-tdemand40,71a-1H-H2s-wm-nH2t-mflex0-ramp10-meohsource60-tdemand40,71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt-tdemand40]
+  country: [GB, DE, ES, ]
+  scenario:
+    [
+      71a-1H-H2s-tdemand40,
+      71a-1H-H2u-tdemand40,
+      71a-1H-H2s-wm-nH2t-mflex50-ramp5-tdemand40,
+      71a-1H-H2s-wm-nH2t-mflex0-ramp10-tdemand40,
+      71a-1H-H2s-wm-nH2t-mflex0-ramp10-meohsource40-tdemand40,
+      71a-1H-H2s-wm-nH2t-mflex0-ramp10-meohsource60-tdemand40,
+      71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt-tdemand40,
+    ]
 
 current_version: 190929
 
@@ -18,9 +26,9 @@ cutout_folder: "../cutouts/"
 
 octant_folder: "../octants/"
 
-weather_years: [2011,2012,2013,2014]
+weather_years: [2011, 2012, 2013, 2014]
 
-tech_years: [2020,2030,2040,2050]
+tech_years: [2030]
 
 tech_years_default: 2030
 
@@ -34,7 +42,6 @@ float_upper_limit: 1.e+7
 
 tech_data_commit: "3a23cfc5808df00a2c039fd0e7ce8755a090d4df"
 trace_commit: "55e71c86d36869079b46377ce7ef16a46afa1d99"
-
 
 renewable:
   onwind:
@@ -62,11 +69,20 @@ octant_compression:
   complevel: 4
   least_significant_digit: 5
 
+balances_to_display: ["electricity", "hydrogen"]
 
-balances_to_display: ["electricity","hydrogen"]
-
-preferred order: ["wind","solar","battery storage","battery inverter","hydrogen storage","hydrogen storing compressor","hydrogen electrolyser","seawater desalination","hydrogen turbine"]
-
+preferred order:
+  [
+    "wind",
+    "solar",
+    "battery storage",
+    "battery inverter",
+    "hydrogen storage",
+    "hydrogen storing compressor",
+    "hydrogen electrolyser",
+    "seawater desalination",
+    "hydrogen turbine",
+  ]
 
 solver:
   name: gurobi
@@ -75,19 +91,18 @@ solver:
 solver_options:
   clip_p_max_pu: 1.e-4
   gurobi-default:
-    threads: 4
+    threads: 8
     method: 2 # barrier
     crossover: 0
-    BarConvTol: 1.e-5
+    BarConvTol: 1.e-4
     Seed: 123
     AggFill: 0
     PreDual: 0
     GURO_PAR_BARDENSETHRESH: 200
-    seed: 10              # Consistent seed for all plattforms
-
+    seed: 10 # Consistent seed for all plattforms
 
 colors:
-  wind : "#3B6182"
+  wind: "#3B6182"
   solar: "#FFFF00"
   battery: "#999999"
   battery_charge: "#999999"
