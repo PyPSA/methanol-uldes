@@ -331,59 +331,34 @@ def run_optimisation(assumptions, pu, scenario_opts):
     network.add("Bus",
                 "compressed hydrogen",
                 carrier="compressed hydrogen")
-    
+
+    network.add("Link",
+                "hydrogen_compressor",
+                carrier="hydrogen storing compressor",
+                bus0="hydrogen",
+                bus1="compressed hydrogen",
+                bus2="electricity",
+                p_nom_extendable=True,
+                efficiency=1,
+                efficiency2=-assumptions["hydrogen_compressor_electricity"],
+                capital_cost=assumptions_df.at["hydrogen_compressor","fixed"])
+
     network.add("Link",
                 "hydrogen_decompressor",
                 carrier="hydrogen storing decompressor",
                 bus0="compressed hydrogen",
                 bus1="hydrogen",
                 p_nom_extendable=True)
-    
-    # TODO e.g. "location" -> use coco based on 2letter country code
-    # Depending on storage technology for H2 use different assumptions for compression and storage
-    if "H2s" in scenario_opts:
-        # H2 storage steel tanks (type 1)
-        network.add("Link",
-                "hydrogen_compressor",
-                carrier="hydrogen storing compressor",
-                bus0="hydrogen",
-                bus1="compressed hydrogen",
-                bus2="electricity",
-                p_nom_extendable=True,
-                efficiency=1,
-                efficiency2=-assumptions["hydrogen_storage_tank_compressor_electricity"],
-                capital_cost=assumptions_df.at["hydrogen_storage_tank_compressor","fixed"])
 
-        network.add("Store",
-                    "hydrogen_energy",
-                    bus="compressed hydrogen",
-                    carrier="hydrogen storage",
-                    e_nom_extendable=True,
-                    e_cyclic=True,
-                    capital_cost=assumptions_df.at["hydrogen_storage_tank","fixed"],
-                    )       
-        
-    elif "H2u" in scenario_opts:
-        # H2 storage caverns underground
-        network.add("Link",
-                "hydrogen_compressor",
-                carrier="hydrogen storing compressor",
-                bus0="hydrogen",
-                bus1="compressed hydrogen",
-                bus2="electricity",
-                p_nom_extendable=True,
-                efficiency=1,
-                efficiency2=-assumptions["hydrogen_storage_cavern_compressor_electricity"],
-                capital_cost=assumptions_df.at["hydrogen_storage_cavern_compressor","fixed"])
- 
-        network.add("Store",
-                    "hydrogen_energy",
-                    bus="compressed hydrogen",
-                    carrier="hydrogen storage",
-                    e_nom_extendable=True,
-                    e_cyclic=True,
-                    capital_cost=assumptions_df.at["hydrogen_storage_cavern","fixed"],
-                    ) 
+    network.add("Store",
+                "hydrogen_energy",
+                bus="compressed hydrogen",
+                carrier="hydrogen storage",
+                e_nom_extendable=True,
+                e_cyclic=True,
+                capital_cost=assumptions_df.at["hydrogen_storage_tank","fixed"] if "H2s" in scenario_opts else assumptions_df.at["hydrogen_storage_cavern","fixed"],
+                )
+
 
     if assumptions["hydrogen"]:
 
@@ -594,6 +569,8 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     capital_cost=assumptions_df.at["oxygen_storage","fixed"],
                     )
 
+
+
     if assumptions["ccgt"]:
         network.add("Link",
                     "CCGT",
@@ -672,17 +649,6 @@ def run_optimisation(assumptions, pu, scenario_opts):
             - network.model["Link-p"].loc[:, "oxygen storage standing losses"]
             == 0,
             name="liquid-oxygen_standing-losses",
-        )
-    
-    if "H2u" in scenario_opts:
-        # For hydrogen caverns compression and evaporation, i.e. injection and withdrawl, are constrained by ratio to each other
-        # important as long as evaporation is free of cost
-        logger.info("Adding hydrogen cavern withdrawl/injection ratio constraint")
-        network.model.add_constraints(
-            network.model["Link-p"].loc[:, "hydrogen_compressor"]
-            - network.model["Link-p"].loc[:, "hydrogen_decompressor"] / assumptions["hydrogen_storage_cavern_withdrawl_injection_ratio"]
-            == 0,
-            name="hydrogen_cavern_withdrawl_injection_ratio",
         )
 
     if "clip_p_max_pu" in config["solver_options"]:
@@ -774,10 +740,8 @@ if __name__ == "__main__":
         assumptions["ocgt"] = True
     if "H2s" in opts:
         assumptions["hydrogen_storage_tank"] = True
-        assumptions["hydrogen_storage_tank_compressor"] = True
     elif "H2u" in opts:
         assumptions["hydrogen_storage_cavern"] = True
-        assumptions["hydrogen_storage_cavern_compressor"] = True
     else:
         print("no H2 storage defined")
         sys.exit()

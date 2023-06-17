@@ -65,7 +65,6 @@ static/d*
 
 !defaults.csv
 !defaults-initial.csv
-!defaults_2050.csv
 
 .snakemake*
 
