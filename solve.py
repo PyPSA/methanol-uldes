@@ -679,8 +679,8 @@ def run_optimisation(assumptions, pu, scenario_opts):
         # important as long as evaporation is free of cost
         logger.info("Adding hydrogen cavern withdrawl/injection ratio constraint")
         network.model.add_constraints(
-            network.model["Link-p"].loc[:, "hydrogen_compressor"]
-            - network.model["Link-p"].loc[:, "hydrogen_decompressor"] / assumptions["hydrogen_storage_cavern_withdrawl_injection_ratio"]
+            network.model["Link-p_nom"].loc["hydrogen_compressor"]
+            - network.model["Link-p_nom"].loc["hydrogen_decompressor"] / assumptions["hydrogen_storage_cavern_withdrawl_injection_ratio"]
             == 0,
             name="hydrogen_cavern_withdrawl_injection_ratio",
         )
