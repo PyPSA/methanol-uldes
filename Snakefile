@@ -164,3 +164,10 @@ rule plot_all:
         rules.plot_cascade.output,
         rules.plot_storage_filling_level.output,
     group: "results"
+
+rule all:
+    input:
+        rules.solve_all.input,
+        rules.plot_all.input,
+    default_target: True
+    localrule: True
