@@ -546,7 +546,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     efficiency=assumptions["allam_cycle_efficiency"]/100.,
                     efficiency2=(assumptions["allam_cycle_co2_capture_efficiency"]/100.)*assumptions["methanolisation_co2"],
                     efficiency3=(-1)*assumptions["allam_cycle_o2"],
-                    capital_cost=assumptions_df.at["allam_cycle","fixed"]*(assumptions["allam_cycle_efficiency"]/100.))
+                    capital_cost=assumptions["allam_factor"]*assumptions_df.at["allam_cycle","fixed"]*(assumptions["allam_cycle_efficiency"]/100.))
 
         # Add oxygen storage in case of Allam cycle
         network.add("Bus",
@@ -753,6 +753,7 @@ if __name__ == "__main__":
     assumptions["meohsource"] = False
     assumptions["temperature_demand"] = False
     assumptions["dac_factor"] = 1.
+    assumptions["allam_factor"] = 1.
 
     opts = scenario.split("-")
     if "wm" in opts:
@@ -811,9 +812,8 @@ if __name__ == "__main__":
             assumptions["temperature_demand_mean"] = float(opt[7:])
         if opt[:3] == "dac":
             assumptions["dac_factor"] = float(opt[3:])
-        if opt[:10] == "saltcavern" and "H2u" in opts:
-            assumptions["hydrogen_energy_cost"] = float(opt[10:].replace("p","."))
-            print("changing salt cavern cost to",assumptions["hydrogen_energy_cost"])
+        if opt[:5] == "allam":
+            assumptions["allam_factor"] = float(opt[5:].replace("p","."))
 
     years = int(opts[0][:-1])
     print(years,"years to optimise")
