@@ -45,12 +45,10 @@ for name,td_name,full_name in [("wind","onwind","Onshore wind turbine"),
                                ("solar","solar-utility","Utility-scale solar PV"),
                                ("hydrogen_electrolyser","electrolysis","Hydrogen electrolyser"),
                                ("desalination","seawater desalination","Seawater desalination"),
-                               ("hydrogen_energy","hydrogen storage underground","Hydrogen underground salt cavern storage"),
                                ("hydrogen_turbine","CCGT","Hydrogen combined cycle turbine"),
+                               ("hydrogen_storage_tank","hydrogen storage tank type 1","Compressed hydrogen storage tank"),
                                ("battery_energy","battery storage","Utility-scale battery energy"),
                                ("battery_power","battery inverter","Utility-scale battery converter power"),
-                               ("hydrogen_compressor","hydrogen storage compressor","Hydrogen storage compressor"),
-                               ("co2_storage","CO2 storage tank","CO2 storage tank"),
                                ("dac","direct air capture","Direct air capture"),
                                ("heat_pump","industrial heat pump medium temperature","Industrial heat pump up to 125 C"),
                                ("liquid_carbonaceous_storage","General liquid hydrocarbon storage (product)","Liquid carbonaceous fuel storage tank"),
@@ -169,6 +167,6 @@ inflation_factor = (1 + config["inflation"]/100)**(config["cost_year"] - config[
 
 print("inflation factor",inflation_factor)
 
-df.loc[cost_df,"value"] = (inflation_factor*df.loc[cost_df,"value"].astype(float)).round(1)
+df.loc[cost_df,"value"] = (inflation_factor*df.loc[cost_df,"value"].astype(float)).round(2)
 
 df.to_csv("defaults.csv")
