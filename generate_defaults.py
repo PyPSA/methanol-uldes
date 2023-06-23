@@ -83,6 +83,18 @@ for year in years:
                                                      "reformer capture rate",
                                                      td[year].loc[("SMR CC","capture_rate"),"source"]]
 
+    df.loc[("dac_electricity",str(year)),:] = ["f",
+                                               td[year].loc[("direct air capture","electricity-input"),"value"],
+                                               td[year].loc[("direct air capture","electricity-input"),"unit"],
+                                               "Direct air capture electricity consumption",
+                                               td[year].loc[("direct air capture","electricity-input"),"source"]]
+
+    df.loc[("dac_heat",str(year)),:] = ["f",
+                                        td[year].loc[("direct air capture","heat-input"),"value"],
+                                        td[year].loc[("direct air capture","heat-input"),"unit"],
+                                        "Direct air capture heat consumption",
+                                        td[year].loc[("direct air capture","heat-input"),"source"]]
+
 
 for name,td_name,full_name in [("battery_power_efficiency_charging","battery inverter","Battery power charging efficiency"),
                                ("battery_power_efficiency_discharging","battery inverter","Battery power discharging efficiency"),
@@ -143,18 +155,6 @@ df.loc[("methanolisation_electricity",""),:] = ["f",
                                                 "MWhel/MWh-MeOH-LHV",
                                                 "Methanol synthesis electricity input",
                                                 eff.loc[("methanolisation","all","electricity"),"source"][0]]
-
-df.loc[("dac_electricity",""),:] = ["f",
-                                    td[year].loc[("direct air capture","electricity-input"),"value"],
-                                    td[year].loc[("direct air capture","electricity-input"),"unit"],
-                                    "Direct air capture electricity consumption",
-                                    td[year].loc[("direct air capture","electricity-input"),"source"]]
-
-df.loc[("dac_heat",""),:] = ["f",
-                             td[year].loc[("direct air capture","heat-input"),"value"],
-                             td[year].loc[("direct air capture","heat-input"),"unit"],
-                             "Direct air capture heat consumption",
-                             td[year].loc[("direct air capture","heat-input"),"source"]]
 
 
 print(df)
