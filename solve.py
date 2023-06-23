@@ -331,14 +331,14 @@ def run_optimisation(assumptions, pu, scenario_opts):
     network.add("Bus",
                 "compressed hydrogen",
                 carrier="compressed hydrogen")
-    
+
     network.add("Link",
                 "hydrogen_decompressor",
                 carrier="hydrogen storing decompressor",
                 bus0="compressed hydrogen",
                 bus1="hydrogen",
                 p_nom_extendable=True)
-    
+
     # TODO e.g. "location" -> use coco based on 2letter country code
     # Depending on storage technology for H2 use different assumptions for compression and storage
     if "H2s" in scenario_opts:
@@ -361,8 +361,8 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     e_nom_extendable=True,
                     e_cyclic=True,
                     capital_cost=assumptions_df.at["hydrogen_storage_tank","fixed"],
-                    )       
-        
+                    )
+
     elif "H2u" in scenario_opts:
         # H2 storage caverns underground
         network.add("Link",
@@ -375,7 +375,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                 efficiency=1,
                 efficiency2=-assumptions["hydrogen_storage_cavern_compressor_electricity"],
                 capital_cost=assumptions_df.at["hydrogen_storage_cavern_compressor","fixed"])
- 
+
         network.add("Store",
                     "hydrogen_energy",
                     bus="compressed hydrogen",
@@ -383,7 +383,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     e_nom_extendable=True,
                     e_cyclic=True,
                     capital_cost=assumptions_df.at["hydrogen_storage_cavern","fixed"],
-                    ) 
+                    )
 
     if assumptions["hydrogen"]:
 
@@ -441,13 +441,13 @@ def run_optimisation(assumptions, pu, scenario_opts):
                         p_nom=1e6,
                         marginal_cost=assumptions["biogenic_co2_price"],
                         carrier="biogenic co2")
-        
+
         # Intermediary bus for pressure conversion before CO2 liquefaction
         network.add("Bus",
                     "co2 high pressure",
                     carrier="co2 high pressure")
-       
-        # Intermediary link; assume difference in liquefaction between low and high pressure for efficiency and cost 
+
+        # Intermediary link; assume difference in liquefaction between low and high pressure for efficiency and cost
         # Reason: DAC CO2 output is assumed to be at low pressure and requires pressure increase
         # Allam cycle CO2 output is assumed to be at high pressure and does not require pressure increase
         network.add("Link",
@@ -673,16 +673,16 @@ def run_optimisation(assumptions, pu, scenario_opts):
             == 0,
             name="liquid-oxygen_standing-losses",
         )
-    
+
     if "H2u" in scenario_opts:
-        # For hydrogen caverns compression and evaporation, i.e. injection and withdrawl, are constrained by ratio to each other
+        # For hydrogen caverns compression and evaporation, i.e. injection and withdrawal, are constrained by ratio to each other
         # important as long as evaporation is free of cost
-        logger.info("Adding hydrogen cavern withdrawl/injection ratio constraint")
+        logger.info("Adding hydrogen cavern withdrawal/injection ratio constraint")
         network.model.add_constraints(
             network.model["Link-p_nom"].loc["hydrogen_compressor"]
-            - network.model["Link-p_nom"].loc["hydrogen_decompressor"] / assumptions["hydrogen_storage_cavern_withdrawl_injection_ratio"]
+            - network.model["Link-p_nom"].loc["hydrogen_decompressor"] / assumptions["hydrogen_storage_cavern_withdrawal_injection_ratio"]
             == 0,
-            name="hydrogen_cavern_withdrawl_injection_ratio",
+            name="hydrogen_cavern_withdrawal_injection_ratio",
         )
 
     if "clip_p_max_pu" in config["solver_options"]:
