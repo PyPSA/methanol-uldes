@@ -138,25 +138,6 @@ df.loc[("hydrogen_compressor_electricity",""),:] = ["f",
                                                     "Hydrogen storage compressor electricity input",
                                                     eff.loc[("H2 storage compressor","all","electricity"),"source"][0]]
 
-df.loc[("methanolisation_efficiency",""),:] = ["f",
-                                               eff.loc[("methanolisation","all","hydrogen (g)"),"to_amount"][0]/eff.loc[("methanolisation","all","hydrogen (g)"),"from_amount"][0],
-                                               "MWh-MeOH-LHV/MWh-H2-LHV",
-                                               "Methanol synthesis efficiency wrt hydrogen",
-                                               eff.loc[("methanolisation","all","hydrogen (g)"),"source"][0]]
-
-df.loc[("methanolisation_co2",""),:] = ["f",
-                                        eff.loc[("methanolisation","all","CO2 (g)"),"from_amount"][0]/eff.loc[("methanolisation","all","CO2 (g)"),"to_amount"][0],
-                                        "tCO2/MWh-MeOH-LHV",
-                                        "Methanol synthesis carbon dioxide input",
-                                        eff.loc[("methanolisation","all","CO2 (g)"),"source"][0]]
-
-df.loc[("methanolisation_electricity",""),:] = ["f",
-                                                eff.loc[("methanolisation","all","electricity"),"from_amount"][0]/eff.loc[("methanolisation","all","electricity"),"to_amount"][0],
-                                                "MWhel/MWh-MeOH-LHV",
-                                                "Methanol synthesis electricity input",
-                                                eff.loc[("methanolisation","all","electricity"),"source"][0]]
-
-
 print(df)
 
 
