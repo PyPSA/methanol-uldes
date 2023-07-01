@@ -209,10 +209,16 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     p_min_pu=-1,
                     p_nom=assumptions["load"])
     elif assumptions["elastic"]:
+        #create inverse demand curve where elastic_intercept is price p where demand d
+        #vanishes and load is demand d for zero p
+        #inverse demand curve: p(d) = intercept - intercept/load*d
+        #utility: U(d) = intercept*d - intercept/(2*load)*d^2
+        #since demand is negative generator, take care with signs!
         network.add("Generator","load",
                     bus="electricity",
                     carrier="load",
                     marginal_cost=assumptions["elastic_intercept"],
+                    marginal_cost_quadratic=assumptions["elastic_intercept"]/(2*assumptions["load"]),
                     p_max_pu=0,
                     p_min_pu=-1,
                     p_nom=assumptions["load"])
@@ -301,15 +307,6 @@ def run_optimisation(assumptions, pu, scenario_opts):
                 p_min_pu=-1,
                 p_nom=1e6,
                 carrier="oxygen vent")
-
-    network.add("Link",
-                "air separation unit",
-                bus0="electricity",
-                bus1="oxygen",
-                carrier="air separation unit",
-                p_nom_extendable=True,
-                capital_cost=assumptions_df.at["air_separation_unit","fixed"]*assumptions["air_separation_unit_efficiency"],
-                efficiency=assumptions["air_separation_unit_efficiency"])
 
     if assumptions["hydrogen_load"] != 0:
         network.add("Load","hydrogen_load",
@@ -548,6 +545,17 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     efficiency3=(-1)*assumptions["allam_cycle_o2"],
                     capital_cost=assumptions["allam_factor"]*assumptions_df.at["allam_cycle","fixed"]*(assumptions["allam_cycle_efficiency"]/100.))
 
+        #ASU only necessary with Allam to top-up oxygen from electrolyser
+        network.add("Link",
+                    "air separation unit",
+                    bus0="electricity",
+                    bus1="oxygen",
+                    carrier="air separation unit",
+                    p_nom_extendable=True,
+                    capital_cost=assumptions_df.at["air_separation_unit","fixed"]*assumptions["air_separation_unit_efficiency"],
+                    efficiency=assumptions["air_separation_unit_efficiency"])
+
+
         # Add oxygen storage in case of Allam cycle
         network.add("Bus",
                 "liquid oxygen",
@@ -637,15 +645,6 @@ def run_optimisation(assumptions, pu, scenario_opts):
         network.add("GlobalConstraint","co2_limit",
                     sense="<=",
                     constant=assumptions["co2_emissions"]*assumptions["load"]*network.snapshot_weightings.objective.sum())
-
-    if assumptions["elastic"]:
-        network.generators["quadratic_coefficient"] = 0.
-        #create inverse demand curve where elastic_intercept is price p where demand d
-        #vanishes and load is demand d for zero p
-        #inverse demand curve: p(d) = intercept - intercept/load*d
-        #utility: U(d) = intercept*d - intercept/(2*load)*d^2
-        #since demand is negative generator, take care with signs!
-        network.generators.at["load","quadratic_coefficient"] = assumptions["elastic_intercept"]/(2*assumptions["load"])
 
     network.consistency_check()
 
