@@ -1,0 +1,14 @@
+name: methanol-ldes
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - numpy
+  - pandas
+  - xarray
+  - pypsa
+  - snakemake-minimal
+  - notebook
+  - seaborn
+  - matplotlib
+  - nbconvert

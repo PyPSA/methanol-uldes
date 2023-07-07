@@ -77,7 +77,7 @@ if "air separation unit" in n.links.index:
     s.loc["air separation unit oxygen capacity"] = n.links.at["air separation unit","p_nom_opt"]*n.links.at["air separation unit","efficiency"]
 
 if "dac" in n.links.index:
-    s.loc["dac oxygen capacity"] = n.links.at["dac","p_nom_opt"]*n.links.at["dac","efficiency"]
+    s.loc["dac co2 capacity"] = n.links.at["dac","p_nom_opt"]*n.links.at["dac","efficiency"]
 
 if "Allam" in n.links.index:
     s.loc["Allam cycle electricity capacity"] = n.links.at["Allam","p_nom_opt"]*n.links.at["Allam","efficiency"]

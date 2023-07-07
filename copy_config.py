@@ -4,7 +4,8 @@ from shutil import copy
 files = [
     "config.yaml",
     "Snakefile",
-    "solve.py"
+    "solve.py",
+    "defaults.csv",
 ]
 
 if __name__ == '__main__':
