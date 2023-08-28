@@ -67,10 +67,9 @@ for c in n.iterate_components(n.branch_components):
 ts = pd.concat([(-1)**i*n.links_t["p"+str(i)][n.links.index[n.links["bus"+str(i)].map(n.buses.carrier) == "electricity"]] for i in range(3)]
                + [n.generators_t.p[n.generators.index[n.generators.bus.map(n.buses.carrier) == "electricity"]]],
                axis=1)
-ts["load"] = n.loads_t.p["load"]
 
 s = pd.concat((s,
-               (ts.sum()/ts["load"].sum()).rename(lambda x: x+ " share")))
+               (ts.sum()/s.loc["total_load"]).rename(lambda x: x+ " share")))
 
 
 if "air separation unit" in n.links.index:

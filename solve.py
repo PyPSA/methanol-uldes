@@ -541,7 +541,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     carrier="Allam cycle",
                     p_nom_extendable=True,
                     efficiency=assumptions["allam_cycle_efficiency"]/100.,
-                    efficiency2=(assumptions["allam_cycle_co2_capture_efficiency"]/100.)*assumptions["methanolisation_co2"],
+                    efficiency2=(assumptions["allam_cycle_co2_capture_efficiency"]/100.)*config["co2_per_mwh"]["methanol"],
                     efficiency3=(-1)*assumptions["allam_cycle_o2"],
                     capital_cost=assumptions["allam_factor"]*assumptions_df.at["allam_cycle","fixed"]*(assumptions["allam_cycle_efficiency"]/100.))
 

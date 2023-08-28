@@ -169,5 +169,5 @@ rule all:
     input:
         rules.solve_all.input,
         rules.plot_all.input,
-    default_target: True
-    localrule: True
+#    default_target: True
+#    localrule: True
