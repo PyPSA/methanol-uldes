@@ -765,6 +765,8 @@ if __name__ == "__main__":
             assumptions["allam_cycle_turbine"] = True
     if "wref" in opts:
         assumptions["reformer"] = True
+    if "nowind" in opts:
+        assumptions["wind"] = False
     if "nH2t" in opts:
         assumptions["hydrogen"] = False
     if "bioco2" in opts:

@@ -3,7 +3,7 @@
 #20a counts back from 2020
 #H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
 
-run: "230828-fixco2"
+run: "230828-nowind"
 
 logging_level: INFO
 
@@ -11,24 +11,10 @@ run_settings:
   country: [UK, DE, ES]
   scenario:
     [
-     71a-1H-H2s,
-     71a-1H-H2u,
-     71a-1H-H2s-wm-nH2t-mflex0-ramp10,
-     71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt,
-     71a-1H-H2s-wm-nH2t-mflex50-ramp5,
-     71a-1H-H2s-wm-nH2t-mflex50-ramp10,
-     71a-1H-H2s-wm-nH2t-mflex20-ramp10,
-     71a-1H-H2s-wm-nH2t-mflex10-ramp10,
-     71a-1H-H2u-wm-nH2t-mflex0-ramp10,
-     71a-1H-H2s-wm-nH2t-mflex0-ramp10-meohsource40,
-     71a-1H-H2s-wm-nH2t-mflex0-ramp10-meohsource60,
-     71a-1H-H2s-tdemand33,
-     71a-1H-H2u-tdemand33,
-     71a-1H-H2s-wm-nH2t-mflex0-ramp10-tdemand33,
-     71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt-tdemand33,
-     71a-1H-H2s-wm-nH2t-mflex0-ramp10-dac2,
-     71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt-dac2,
-     71a-1H-H2s-wm-nH2t-mflex0-ramp10-allam0p5,
+     71a-1H-H2s-nowind,
+     71a-1H-H2u-nowind,
+     71a-1H-H2s-wm-nH2t-mflex0-ramp10-nowind,
+     71a-1H-H2s-wm-nH2t-mflex0-ramp10-ccgt-nowind,
     ]
 
 current_version: 190929
