@@ -1,5 +1,5 @@
 
-# Methanol storage with carbon cycling for long-duration energy storage
+# Methanol storage with carbon cycling for ultra-long-duration energy storage (ULDES)
 
 
 ## Data requirements
