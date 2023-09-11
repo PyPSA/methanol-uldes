@@ -119,3 +119,4 @@ hydrogen_storage_tank_compressor_cost,2030,f,79.4,EUR/kW_H2,Hydrogen storage com
 hydrogen_storage_tank_compressor_fom,2030,f,4.0,percent of overnight cost per year,Hydrogen storage compressor fixed operation and maintenance costs,"Based on Stöckl et al (2021): https://doi.org/10.48550/arXiv.2005.03464, table SI.4 for GH2 (large) storage"
 hydrogen_storage_tank_compressor_lifetime,2030,f,15.0,years,Hydrogen storage compressor lifetime,"Based on Stöckl et al (2021): https://doi.org/10.48550/arXiv.2005.03464, table SI.4 for GH2 (large) storage"
 hydrogen_storage_tank_compressor_electricity,,f,0.0512,MWhel/MWh-H2-LHV,Hydrogen storage compressor electricity input from 30 bar to 250 bar,"Based on Stöckl et al (2021): https://doi.org/10.48550/arXiv.2005.03464, table SI.4 for GH2 (large) storage"
+liquid_hydrogen_storage_standing_loss,,f,0.2,percent/day,"Runge et al, 2020"

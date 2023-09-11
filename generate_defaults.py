@@ -53,7 +53,10 @@ for name,td_name,full_name in [("wind","onwind","Onshore wind turbine"),
                                ("heat_pump","industrial heat pump medium temperature","Industrial heat pump up to 125 C"),
                                ("liquid_carbonaceous_storage","General liquid hydrocarbon storage (product)","Liquid carbonaceous fuel storage tank"),
                                ("reformer","SMR CC","Steam methanol reformer with carbon capture"),
-                               ("methanolisation","methanolisation","Methanol synthesis")]:
+                               ("methanolisation","methanolisation","Methanol synthesis"),
+                               ("hydrogen_liquefaction","H2 liquefaction","Hydrogen liquefaction"),
+                               ("liquid_hydrogen_storage","H2 (l) storage tank","Liquid hydrogen storage tank"),
+                               ]:
     print(name,full_name)
     df.loc[(name + "_discount",""),:] = ["f",5,"percent",full_name + " discount rate",""]
     for year in years:
@@ -138,8 +141,22 @@ df.loc[("hydrogen_compressor_electricity",""),:] = ["f",
                                                     "Hydrogen storage compressor electricity input",
                                                     eff.loc[("H2 storage compressor","all","electricity"),"source"][0]]
 
-print(df)
 
+df.loc[("hydrogen_liquefaction_efficiency",""),:] = ["f",
+                                                     eff.loc[("H2 liquefaction","all","hydrogen (g)"),"to_amount"][0]/eff.loc[("H2 liquefaction","all","hydrogen (g)"),"from_amount"][0],
+                                                     "MWh-H2-liquid/MWh-H2-gas",
+                                                     "Hydrogen liquefaction efficiency",
+                                                     eff.loc[("H2 liquefaction","all","hydrogen (g)"),"source"][0]]
+
+
+df.loc[("hydrogen_liquefaction_electricity",""),:] = ["f",
+                                                     eff.loc[("H2 liquefaction","all","electricity"),"from_amount"][0]/eff.loc[("H2 liquefaction","all","electricity"),"to_amount"][0],
+                                                     "MWh-el/MWh-H2-LHV",
+                                                     "Hydrogen liquefaction electricity input",
+                                                     eff.loc[("H2 liquefaction","all","electricity"),"source"][0]]
+
+
+print(df)
 
 
 cost_df = df.index[df.index.get_level_values(0).str.contains("cost") & (~df.index.get_level_values(0).str.contains("marginal_cost")) & (~df.index.get_level_values(0).str.contains("co2_cost"))]

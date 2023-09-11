@@ -382,6 +382,38 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     capital_cost=assumptions_df.at["hydrogen_storage_cavern","fixed"],
                     )
 
+    elif "H2l" in scenario_opts:
+        # LH2 tanks
+        network.add("Link",
+                    "hydrogen_liquefaction",
+                    carrier="hydrogen liquefaction",
+                    bus0="hydrogen",
+                    bus1="compressed hydrogen",
+                    bus2="electricity",
+                    p_nom_extendable=True,
+                    efficiency=assumptions["hydrogen_liquefaction_efficiency"],
+                    efficiency2=-(assumptions["hydrogen_compressor_electricity"] + assumptions["hydrogen_liquefaction_electricity"])*assumptions["hydrogen_liquefaction_efficiency"],
+                    capital_cost=assumptions_df.at["hydrogen_liquefaction","fixed"])
+
+        network.add("Store",
+                    "hydrogen_energy",
+                    bus="compressed hydrogen",
+                    carrier="hydrogen storage",
+                    e_nom_extendable=True,
+                    e_cyclic=True,
+                    capital_cost=assumptions_df.at["liquid_hydrogen_storage","fixed"],
+                    )
+
+        # Later implemented via custom constraint
+        network.add("Link",
+                    "liquid hydrogen storage standing losses",
+                    bus0="compressed hydrogen",
+                    bus1="hydrogen",
+                    carrier="liquid hydrogen storage standing losses",
+                    efficiency=1,
+                    p_nom=1e6 #dummy value instead of capacity expansion
+        )
+
     if assumptions["hydrogen"]:
 
         network.add("Link",
@@ -673,6 +705,19 @@ def run_optimisation(assumptions, pu, scenario_opts):
             name="liquid-oxygen_standing-losses",
         )
 
+    if "liquid hydrogen storage standing losses" in network.links.index:
+        # standing losses in %/day, convert to p.u./hour and round to 6 decimals because higher accuracy irrelevant
+        hourly_standing_losses=np.round(1-np.power(1-assumptions["liquid_hydrogen_storage_standing_loss"]/100, 1/24), 6)
+
+        # Standing losses equivalent to state of charge of previous timestep
+        network.model.add_constraints(
+            hourly_standing_losses
+            * network.model["Store-e"].loc[np.concatenate((network.snapshots[-1:], network.snapshots[:-1])), "hydrogen_energy"]
+            - network.model["Link-p"].loc[:, "liquid hydrogen storage standing losses"]
+            == 0,
+            name="liquid-hydrogen_standing-losses",
+        )
+
     if "H2u" in scenario_opts:
         # For hydrogen caverns compression and evaporation, i.e. injection and withdrawal, are constrained by ratio to each other
         # important as long as evaporation is free of cost
@@ -775,15 +820,6 @@ if __name__ == "__main__":
         assumptions["ccgt"] = True
     if "ocgt" in opts:
         assumptions["ocgt"] = True
-    if "H2s" in opts:
-        assumptions["hydrogen_storage_tank"] = True
-        assumptions["hydrogen_storage_tank_compressor"] = True
-    elif "H2u" in opts:
-        assumptions["hydrogen_storage_cavern"] = True
-        assumptions["hydrogen_storage_cavern_compressor"] = True
-    else:
-        print("no H2 storage defined")
-        sys.exit()
 
     for opt in opts:
         if opt[-1:] == "H":

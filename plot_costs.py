@@ -19,6 +19,7 @@ preferred_order = pd.Index([
     "wind",
     "battery",
     "hydrogen electrolyser",
+    "hydrogen liquefaction",
     "hydrogen storage",
     "hydrogen turbine",
     "methanol storage",
