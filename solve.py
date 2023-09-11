@@ -820,6 +820,9 @@ if __name__ == "__main__":
         assumptions["ccgt"] = True
     if "ocgt" in opts:
         assumptions["ocgt"] = True
+    if "pessimisticH2l" in opts:
+        assumptions["hydrogen_liquefaction_electricity"] = 0.24
+        assumptions["liquid_hydrogen_storage_standing_loss"] = 3
 
     for opt in opts:
         if opt[-1:] == "H":
