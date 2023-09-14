@@ -3,7 +3,7 @@
 #20a counts back from 2020
 #H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
 
-run: "230911-lh2pess-71a"
+run: "230914-lh2wH2s-1a"
 
 logging_level: INFO
 
@@ -11,9 +11,8 @@ run_settings:
   country: [DE]
   scenario:
     [
-     71a-1H-H2u,
-     71a-1H-H2l,
-     71a-1H-H2l-pessimisticH2l,
+     1a-1H-H2l,
+     1a-1H-H2l-pessimisticH2l,
     ]
 
 current_version: 190929

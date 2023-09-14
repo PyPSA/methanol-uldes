@@ -334,7 +334,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                 carrier="hydrogen storing decompressor",
                 bus0="compressed hydrogen",
                 bus1="hydrogen",
-                p_nom_extendable=True)
+                p_nom=1e6)
 
     # TODO e.g. "location" -> use coco based on 2letter country code
     # Depending on storage technology for H2 use different assumptions for compression and storage
@@ -383,17 +383,17 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     )
 
     elif "H2l" in scenario_opts:
-        # LH2 tanks
+        # H2 storage steel tanks (type 1)
         network.add("Link",
-                    "hydrogen_liquefaction",
-                    carrier="hydrogen liquefaction",
-                    bus0="hydrogen",
-                    bus1="compressed hydrogen",
-                    bus2="electricity",
-                    p_nom_extendable=True,
-                    efficiency=assumptions["hydrogen_liquefaction_efficiency"],
-                    efficiency2=-(assumptions["hydrogen_compressor_electricity"] + assumptions["hydrogen_liquefaction_electricity"])*assumptions["hydrogen_liquefaction_efficiency"],
-                    capital_cost=assumptions_df.at["hydrogen_liquefaction","fixed"])
+                "hydrogen_compressor",
+                carrier="hydrogen storing compressor",
+                bus0="hydrogen",
+                bus1="compressed hydrogen",
+                bus2="electricity",
+                p_nom_extendable=True,
+                efficiency=1,
+                efficiency2=-assumptions["hydrogen_storage_tank_compressor_electricity"],
+                capital_cost=assumptions_df.at["hydrogen_storage_tank_compressor","fixed"])
 
         network.add("Store",
                     "hydrogen_energy",
@@ -401,14 +401,46 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     carrier="hydrogen storage",
                     e_nom_extendable=True,
                     e_cyclic=True,
+                    capital_cost=assumptions_df.at["hydrogen_storage_tank","fixed"],
+                    )
+
+        network.add("Bus",
+                    "liquid hydrogen",
+                    carrier="liquid hydrogen")
+
+        # LH2 tanks
+        network.add("Link",
+                    "hydrogen_liquefaction",
+                    carrier="hydrogen liquefaction",
+                    bus0="compressed hydrogen",
+                    bus1="liquid hydrogen",
+                    bus2="electricity",
+                    p_nom_extendable=True,
+                    efficiency=assumptions["hydrogen_liquefaction_efficiency"],
+                    efficiency2=-assumptions["hydrogen_liquefaction_electricity"]*assumptions["hydrogen_liquefaction_efficiency"],
+                    capital_cost=assumptions_df.at["hydrogen_liquefaction","fixed"])
+
+        network.add("Store",
+                    "liquid hydrogen",
+                    bus="liquid hydrogen",
+                    carrier="hydrogen storage",
+                    e_nom_extendable=True,
+                    e_cyclic=True,
                     capital_cost=assumptions_df.at["liquid_hydrogen_storage","fixed"],
                     )
+
+        network.add("Link",
+                    "hydrogen_deliquefier",
+                    carrier="hydrogen storing deliquefier",
+                    bus0="liquid hydrogen",
+                    bus1="compressed hydrogen",
+                    p_nom=1e6)
 
         # Later implemented via custom constraint
         network.add("Link",
                     "liquid hydrogen storage standing losses",
-                    bus0="compressed hydrogen",
-                    bus1="hydrogen",
+                    bus0="liquid hydrogen",
+                    bus1="compressed hydrogen",
                     carrier="liquid hydrogen storage standing losses",
                     efficiency=1,
                     p_nom=1e6 #dummy value instead of capacity expansion
@@ -712,7 +744,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
         # Standing losses equivalent to state of charge of previous timestep
         network.model.add_constraints(
             hourly_standing_losses
-            * network.model["Store-e"].loc[np.concatenate((network.snapshots[-1:], network.snapshots[:-1])), "hydrogen_energy"]
+            * network.model["Store-e"].loc[np.concatenate((network.snapshots[-1:], network.snapshots[:-1])), "liquid hydrogen"]
             - network.model["Link-p"].loc[:, "liquid hydrogen storage standing losses"]
             == 0,
             name="liquid-hydrogen_standing-losses",
