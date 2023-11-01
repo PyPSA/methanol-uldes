@@ -1,6 +1,10 @@
 
 # Methanol storage with carbon cycling for ultra-long-duration energy storage (ULDES)
 
+This repository provides the code for the research paper [Ultra-long-duration energy storage anywhere: Methanol with carbon cycling](https://doi.org/10.1016/j.joule.2023.10.001) (Joule, 2023).
+
+The code and output results, including solved networks, are available in the accompanying [Zenodo repository](https://zenodo.org/doi/10.5281/zenodo.8307904).
+
 
 ## Data requirements
 
