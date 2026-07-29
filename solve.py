@@ -91,53 +91,6 @@ octant_folder = config["octant_folder"]
 solar_correction_factor = 0.926328
 
 
-override_component_attrs = pypsa.descriptors.Dict(
-        {k: v.copy() for k, v in pypsa.components.component_attrs.items()}
-    )
-override_component_attrs["Link"].loc["bus2"] = [
-        "string",
-        np.nan,
-        np.nan,
-        "2nd bus",
-        "Input (optional)",
-    ]
-override_component_attrs["Link"].loc["bus3"] = [
-        "string",
-        np.nan,
-        np.nan,
-        "3rd bus",
-        "Input (optional)",
-    ]
-override_component_attrs["Link"].loc["efficiency2"] = [
-        "static or series",
-        "per unit",
-        1.0,
-        "2nd bus efficiency",
-        "Input (optional)",
-    ]
-override_component_attrs["Link"].loc["efficiency3"] = [
-        "static or series",
-        "per unit",
-        1.0,
-        "3rd bus efficiency",
-        "Input (optional)",
-    ]
-override_component_attrs["Link"].loc["p2"] = [
-        "series",
-        "MW",
-        0.0,
-        "2nd bus output",
-        "Output",
-    ]
-override_component_attrs["Link"].loc["p3"] = [
-        "series",
-        "MW",
-        0.0,
-        "3rd bus output",
-        "Output",
-    ]
-
-
 
 def annuity(lifetime,rate):
     if rate == 0.:
@@ -181,12 +134,14 @@ def run_optimisation(assumptions, pu, scenario_opts):
 
     print('Starting task for {} with assumptions {}'.format(assumptions["location"],assumptions_df))
 
-    network = pypsa.Network(override_component_attrs=override_component_attrs)
+    network = pypsa.Network()
 
     snapshots = pd.date_range("{}-01-01".format(year_start),"{}-12-31 23:00".format(year_end),
                               freq=str(assumptions["frequency"])+"H")
 
     network.set_snapshots(snapshots)
+
+    pu = pu.loc[network.snapshots]
 
     network.snapshot_weightings = pd.Series(float(assumptions["frequency"]),index=network.snapshots)
 
@@ -788,7 +743,6 @@ if __name__ == "__main__":
 
     # Detect running outside of snakemake and mock up snakemake for testing
     if 'snakemake' not in globals():
-        from pypsa.descriptors import Dict
         import yaml
         from types import SimpleNamespace
 

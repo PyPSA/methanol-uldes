@@ -1,6 +1,3 @@
-# Download files using Snakemake
-from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
-HTTP = HTTPRemoteProvider()
 
 # Filesystem operations
 import shutil
@@ -13,34 +10,6 @@ configfile: "config.yaml"
 wildcard_constraints:
     scenario="[a-zA-Z0-9\.\-\_]+",
     country="[a-zA-Z]+"
-
-# Download timeseries Bloomfield and Brayshaw (2021) fomr https://doi.org/10.17864/1947.000321
-rule download_timeseries:
-    input:
-        HTTP.remote(
-            "researchdata.reading.ac.uk/321/4/ERA5_data_1950-2020.zip",
-        ),
-    output:
-        solar="data/NUTS_0_sp_historical.nc",
-        onwind0="data/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
-        onwind1="data/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
-	temperature="data/NUTS_0_t2m_detrended_timeseries_historical_pop_weighted.nc",
-    run:
-        # Files to extract
-        fps = [
-            "ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc",
-            "ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
-            "ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
-	    "ERA5_data_1950-2020/t2m/NUTS_0_t2m_detrended_timeseries_historical_pop_weighted.nc",
-        ]
-        # extract and move files to this dir
-        output_dir = "data/"
-        with zipfile.ZipFile(input[0], "r") as zf:
-            for fp in fps:
-                zf.extract(fp, output_dir)
-                shutil.move(output_dir + fp, output_dir + str(Path(fp).name))
-        # Delete folders created from extracting zip file
-        shutil.rmtree("data/ERA5_data_1950-2020")
 
 rule solve_all:
     input:
@@ -107,10 +76,10 @@ rule get_filling:
 
 rule solve:
     input:
-        solar=rules.download_timeseries.output.solar,
-        onwind0=rules.download_timeseries.output.onwind0,
-        onwind1=rules.download_timeseries.output.onwind1,
-	temperature=rules.download_timeseries.output.temperature,
+        solar="data/NUTS_0_sp_historical.nc",
+        onwind0="data/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
+        onwind1="data/NUTS_0_wp_ons_sim_1_historical_loc_weighted.nc",
+        temperature="data/NUTS_0_t2m_detrended_timeseries_historical_pop_weighted.nc"
     output:
         "networks/" + config['run'] + "/{country}-{scenario}.nc"
     group: "scenario"
