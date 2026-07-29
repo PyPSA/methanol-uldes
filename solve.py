@@ -301,7 +301,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                 carrier="hydrogen storing decompressor",
                 bus0="compressed hydrogen",
                 bus1="hydrogen",
-                p_nom=1e6)
+                p_nom_extendable=True) # NB for LH2 need this to be p_nom=1e6
 
     # TODO e.g. "location" -> use coco based on 2letter country code
     # Depending on storage technology for H2 use different assumptions for compression and storage

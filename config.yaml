@@ -12,7 +12,7 @@ run_settings:
   scenario:
     [
      3a-1H-H2s,
-     #3a-1H-H2u,
+     3a-1H-H2u,
      3a-1H-H2s-wm-nH2t-mflex0-ramp10,
      3a-1H-H2s-mrsoc-nH2t-mflex0-ramp10-allam1,
      3a-1H-H2s-mrsoc-nH2t-mflex0-ramp10-allam2,
