@@ -279,7 +279,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     p_nom_extendable=True,
                     efficiency=assumptions["hydrogen_electrolyser_efficiency"]/100.,
                     efficiency2=8*assumptions["hydrogen_electrolyser_efficiency"]/100./33,  # divide by 33 to get tH2, multiply by 8 to get tO2
-                    capital_cost=assumptions_df.at["hydrogen_electrolyser","fixed"])
+                    capital_cost=assumptions["electrolysis_factor"]*assumptions_df.at["hydrogen_electrolyser","fixed"])
     else:
         network.add("Link",
                     "rsoc_electrolysis",
@@ -422,7 +422,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                      carrier="hydrogen turbine",
                      p_nom_extendable=True,
                      efficiency=assumptions["hydrogen_turbine_efficiency"]/100.,
-                     capital_cost=assumptions_df.at["hydrogen_turbine","fixed"]*assumptions["hydrogen_turbine_efficiency"]/100.)  #NB: fixed cost is per MWel
+                     capital_cost=assumptions["turbine_factor"]*assumptions_df.at["hydrogen_turbine","fixed"]*assumptions["hydrogen_turbine_efficiency"]/100.)  #NB: fixed cost is per MWel
 
     if assumptions["methanol"] or assumptions["methanol_load"] != 0:
 
@@ -652,7 +652,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     carrier="CCGT",
                     p_nom_extendable=True,
                     efficiency=0.6,
-                    capital_cost=assumptions_df.at["hydrogen_turbine","fixed"]*0.6)
+                    capital_cost=assumptions["turbine_factor"]*assumptions_df.at["hydrogen_turbine","fixed"]*0.6)
 
     if assumptions["ocgt"]:
         network.add("Link",
@@ -662,7 +662,7 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     carrier="OCGT",
                     p_nom_extendable=True,
                     efficiency=0.35,
-                    capital_cost=0.5*assumptions_df.at["hydrogen_turbine","fixed"]*0.35)
+                    capital_cost=assumptions["turbine_factor"]*0.5*assumptions_df.at["hydrogen_turbine","fixed"]*0.35)
 
     if assumptions["methanol_load"] != 0:
         network.add("Load","methanol_load",
@@ -812,6 +812,8 @@ if __name__ == "__main__":
     assumptions["temperature_demand"] = False
     assumptions["dac_factor"] = 1.
     assumptions["allam_factor"] = 1.
+    assumptions["electrolysis_factor"] = 1.
+    assumptions["turbine_factor"] = 1.
     assumptions["rsoc"] = False
 
     opts = scenario.split("-")
@@ -872,6 +874,10 @@ if __name__ == "__main__":
             assumptions["dac_factor"] = float(opt[3:])
         if opt[:5] == "allam":
             assumptions["allam_factor"] = float(opt[5:].replace("p","."))
+        if opt[:7] == "turbine":
+            assumptions["turbine_factor"] = float(opt[7:].replace("p","."))
+        if opt[:12] == "electrolysis":
+            assumptions["electrolysis_factor"] = float(opt[12:].replace("p","."))
 
     years = int(opts[0][:-1])
     print(years,"years to optimise")

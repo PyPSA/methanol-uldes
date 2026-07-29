@@ -9,6 +9,16 @@ import matplotlib.pyplot as plt
 import os
 import yaml
 
+# Detect running outside of snakemake and mock up snakemake for testing
+if 'snakemake' not in globals():
+    import yaml
+    from types import SimpleNamespace
+
+    snakemake = SimpleNamespace()
+
+    with open('config.yaml') as f:
+        snakemake.config = yaml.safe_load(f)
+
 
 # In[ ]:
 
@@ -177,7 +187,7 @@ costs = costs.loc[new_index]
 
 #print(costs)
 
-costs.T.plot(kind="bar",stacked=True,color=[colors[i] for i in costs.index],
+costs.T.plot(kind="bar",stacked=True,color=[snakemake.config["colors"][i] for i in costs.index],
              linewidth=0,
              ax=ax,
              rot=0)

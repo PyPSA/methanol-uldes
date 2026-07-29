@@ -3,7 +3,7 @@
 #20a counts back from 2020
 #H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
 
-run: "260729-mrsoc"
+run: "260729-mrsoc-realistic"
 
 logging_level: INFO
 
@@ -11,9 +11,9 @@ run_settings:
   country: [DE]
   scenario:
     [
-     3a-1H-H2s,
-     3a-1H-H2u,
-     3a-1H-H2s-wm-nH2t-mflex0-ramp10,
+     3a-1H-H2s-electrolysis5-turbine3,
+     3a-1H-H2u-electrolysis5-turbine3,
+     3a-1H-H2s-wm-nH2t-mflex0-ramp10-allam2-electrolysis5,
      3a-1H-H2s-mrsoc-nH2t-mflex0-ramp10-allam1,
      3a-1H-H2s-mrsoc-nH2t-mflex0-ramp10-allam2,
     ]
@@ -130,6 +130,7 @@ colors:
   load: black
   hydrogen_load: purple
   dac: "#999966"
+  direct air capture: "#999966"
   co2 storage: "#666633"
   heat pump: red
   methanol synthesis: "#F08080"
@@ -138,3 +139,5 @@ colors:
   methanol source: magenta
   rsoc electrolyser: pink
   rsoc fuel cell: pink
+  air separation unit: k
+  oxygen storage: green
