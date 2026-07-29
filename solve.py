@@ -269,16 +269,28 @@ def run_optimisation(assumptions, pu, scenario_opts):
                     carrier="hydrogen",
                     p_set=assumptions["hydrogen_load"])
 
-    network.add("Link",
-                "hydrogen_electrolyser",
-                bus0="electricity",
-                bus1="hydrogen",
-                bus2="oxygen",
-                carrier="hydrogen electrolyser",
-                p_nom_extendable=True,
-                efficiency=assumptions["hydrogen_electrolyser_efficiency"]/100.,
-                efficiency2=8*assumptions["hydrogen_electrolyser_efficiency"]/100./33,  # divide by 33 to get tH2, multiply by 8 to get tO2
-                capital_cost=assumptions_df.at["hydrogen_electrolyser","fixed"])
+    if not assumptions["rsoc"]:
+        network.add("Link",
+                    "hydrogen_electrolyser",
+                    bus0="electricity",
+                    bus1="hydrogen",
+                    bus2="oxygen",
+                    carrier="hydrogen electrolyser",
+                    p_nom_extendable=True,
+                    efficiency=assumptions["hydrogen_electrolyser_efficiency"]/100.,
+                    efficiency2=8*assumptions["hydrogen_electrolyser_efficiency"]/100./33,  # divide by 33 to get tH2, multiply by 8 to get tO2
+                    capital_cost=assumptions_df.at["hydrogen_electrolyser","fixed"])
+    else:
+        network.add("Link",
+                    "rsoc_electrolysis",
+                    bus0="electricity",
+                    bus1="hydrogen",
+                    bus2="oxygen",
+                    carrier="rsoc electrolyser",
+                    p_nom_extendable=True,
+                    efficiency=assumptions["hydrogen_electrolyser_efficiency"]/100.,
+                    efficiency2=8*assumptions["hydrogen_electrolyser_efficiency"]/100./33,  # divide by 33 to get tH2, multiply by 8 to get tO2
+                    capital_cost=0.)
 
     network.add("Bus",
                 "compressed hydrogen",
@@ -550,7 +562,18 @@ def run_optimisation(assumptions, pu, scenario_opts):
                         marginal_cost=assumptions["meohsource_marginal_cost"],#60 mimics 50 EUR/MWh LNG + 50 EUR/tCO2 CCS OR v. cheap clean MeOH
                         carrier="methanol source")
 
-    if assumptions["methanol"] and not assumptions["ccgt"]:
+    if assumptions["methanol"] and assumptions["rsoc"]:
+        network.add("Link",
+                    "rsoc_fuel_cell",
+                    bus0="methanol",
+                    bus1="electricity",
+                    bus2="co2 high pressure",
+                    carrier="rsoc fuel cell",
+                    p_nom_extendable=True,
+                    efficiency=assumptions["allam_cycle_efficiency"]/100.,
+                    efficiency2=(assumptions["allam_cycle_co2_capture_efficiency"]/100.)*config["co2_per_mwh"]["methanol"],
+                    capital_cost=assumptions["allam_factor"]*assumptions_df.at["allam_cycle","fixed"]*(assumptions["allam_cycle_efficiency"]/100.))
+    elif assumptions["methanol"] and not assumptions["ccgt"]:
         network.add("Link",
                     "Allam",
                     bus0="methanol",
@@ -679,6 +702,11 @@ def run_optimisation(assumptions, pu, scenario_opts):
                                       network.model["Link-p_nom"].loc["battery_discharge"] == 0,
                                       name='charger_ratio')
 
+    if assumptions["methanol"] and assumptions["rsoc"]:
+        network.model.add_constraints(network.model["Link-p_nom"].loc["rsoc_electrolysis"]
+                                      -network.model["Link-p_nom"].loc["rsoc_fuel_cell"] == 0,
+                                      name='reversible_soc')
+
     if "oxygen storage standing losses" in network.links.index:
         # standing losses in %/day, convert to p.u./hour and round to 6 decimals because higher accuracy irrelevant
         hourly_standing_losses=np.round(1-np.power(1-assumptions["oxygen_storage_standing_loss"]/100, 1/24), 6)
@@ -784,6 +812,7 @@ if __name__ == "__main__":
     assumptions["temperature_demand"] = False
     assumptions["dac_factor"] = 1.
     assumptions["allam_factor"] = 1.
+    assumptions["rsoc"] = False
 
     opts = scenario.split("-")
     if "wm" in opts:
@@ -794,6 +823,9 @@ if __name__ == "__main__":
             assumptions["air_separation_unit"] = True
             assumptions["oxygen_storage"] = True
             assumptions["allam_cycle_turbine"] = True
+    if "mrsoc" in opts:
+        assumptions["methanol"] = True
+        assumptions["rsoc"] = True
     if "wref" in opts:
         assumptions["reformer"] = True
     if "nowind" in opts:

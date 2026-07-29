@@ -3,7 +3,7 @@
 #20a counts back from 2020
 #H2u or H2s: underground or steel tanks; nH2t without H2 turbine; wm with methanol
 
-run: "230914-lh2wH2s-1a"
+run: "260729-mrsoc"
 
 logging_level: INFO
 
@@ -11,8 +11,11 @@ run_settings:
   country: [DE]
   scenario:
     [
-     1a-1H-H2l,
-     1a-1H-H2l-pessimisticH2l,
+     3a-1H-H2s,
+     #3a-1H-H2u,
+     3a-1H-H2s-wm-nH2t-mflex0-ramp10,
+     3a-1H-H2s-mrsoc-nH2t-mflex0-ramp10-allam1,
+     3a-1H-H2s-mrsoc-nH2t-mflex0-ramp10-allam2,
     ]
 
 current_version: 190929
@@ -133,3 +136,5 @@ colors:
   methanol storage: black
   Allam cycle: pink
   methanol source: magenta
+  rsoc electrolyser: pink
+  rsoc fuel cell: pink

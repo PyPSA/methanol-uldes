@@ -28,6 +28,8 @@ preferred_order = pd.Index([
     "oxygen storage",
     #"liquid oxygen storage",
     "Allam cycle",
+    "rsoc electrolyser",
+    "rsoc fuel cell",
     "heat pump",
     "direct air capture",
     "co2 storage",
